@@ -1,0 +1,19 @@
+EmptyArmor 12 4 5 5 2 clobbers
+ClawBeast 18 5 6 4 4 claws
+FireLizard 8 2 3 7 1 burns
+Will-O-Wisp 3 3 25 10 2 torches
+Boss 25 8 9 10 6 wallops
+TwistedSapling 34 4 1 4 4 whacks
+PaleFish 18 5 7 9 8 bites
+Ogre 22 9 8 4 10 swats
+MagicBook 30 10 13 9 14 freezes
+Wizard 35 16 12 12 16 mangles
+Mannequin 30 14 14 10 14 grabs
+BigLobster 32 12 12 12 12 pinches
+MegaTree 45 20 20 18 24 slices
+ManicAxe 52 24 22 20 30 chops
+PhaserMoon 60 25 25 17 35 pummels
+GhastlyCampfire 55 25 22 15 24 scorches
+SpikedT-Rex 68 30 20 2 35 stabs
+Ultimatum 80 28 26 32 59 crushes
+
