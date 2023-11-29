@@ -2,17 +2,19 @@ class Player {
     public:
         void Print();
         // These functions return the Player's current stats.
-        int GetLevel();
-        int GetHP();
-        int GetATK();
-        int GetDEF();
-        int GetAG();
-        int GetCurrentEXP();
-        int GetEXPToNextLevel();
-        int GetGold();
+        int GetLevel() const;
+        int GetMaxHP() const;
+        int GetCurrentHP() const;
+        int GetATK() const;
+        int GetDEF() const;
+        int GetAG() const;
+        int GetCurrentEXP() const;
+        int GetEXPToNextLevel() const;
+        int GetGold() const;
         // These functions set the Player's stats.
         void SetLevel(int);
-        void SetHP(int);
+        void SetMaxHP(int);
+        void SetCurrentHP(int);
         void SetATK(int);
         void SetDEF(int);
         void SetAG(int);
@@ -21,7 +23,8 @@ class Player {
         void SetGold(int);
         // These functions raise (or lower) the Player's stats.
         void RaiseLevel(int);
-        void RaiseHP(int);
+        void RaiseMaxHP(int);
+        void LowerCurrentHP(int);
         void RaiseATK(int);
         void RaiseDEF(int);
         void RaiseAG(int);
@@ -31,13 +34,13 @@ class Player {
         void LowerGold(int);
 
     private:
-        // Starting player stats.
         int Level = 1;
-        int HP = 20;
+        int CurrentHP = 20;
+        int MaxHP = 20;
         int ATK = 5;
         int DEF = 5;
         int AG = 5;
         int CurrentEXP = 0;
-        int EXPToNextLevel = 12;
+        int EXPToNextLevel = 5;
         int Gold = 15;
 };
