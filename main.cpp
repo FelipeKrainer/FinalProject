@@ -386,9 +386,6 @@ bool PlayerTurn(int MonsterNumber) {
                     Sleep(1000);
                     DisplayStats();
                     DisplayMonsterStats(MonsterNumber);
-                    
-                    
-
                 }
                 else {
                     //Setting new value for current health
@@ -399,9 +396,6 @@ bool PlayerTurn(int MonsterNumber) {
                     Sleep(1000);
                     DisplayStats();
                     DisplayMonsterStats(MonsterNumber);
-                    
-                    
-                    
                 }
 
             }else {
@@ -411,8 +405,6 @@ bool PlayerTurn(int MonsterNumber) {
                 DisplayMonsterStats(MonsterNumber);
                 
             }
-            
-
         }
         //Creating the logic of the Blue Potion
         else if (ChosenPotion == "b"){
@@ -430,9 +422,6 @@ bool PlayerTurn(int MonsterNumber) {
                     Sleep(1000);
                     DisplayStats();
                     DisplayMonsterStats(MonsterNumber);
-                    
-                    
-
                 }
                 else {
                     //Setting new value for current health
@@ -443,9 +432,6 @@ bool PlayerTurn(int MonsterNumber) {
                     Sleep(1000);
                     DisplayStats();
                     DisplayMonsterStats(MonsterNumber);
-                    
-                    
-                    
                 }
 
             }else {
