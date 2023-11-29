@@ -1,11 +1,18 @@
 #include "Player.h"
 #include <iostream>
+#include <random>
+#include <windows.h>
 
 using namespace std;
 
+std::random_device Random;
+std::mt19937 generator(Random());
+std::uniform_int_distribution<int> distribution(1, 3);
+
 void Player::Print() {
         cout << "Player Level: " << Level << endl;
-        cout << "Player HP: " << HP << endl;
+        cout << "Player Max HP: " << MaxHP << endl;
+        cout << "Player Current HP: " << CurrentHP << endl;
         cout << "Player ATK: " << ATK << endl;
         cout << "Player DEF: " << DEF << endl;
         cout << "Player AG: " << AG << endl;
@@ -14,35 +21,39 @@ void Player::Print() {
         cout << "Player Gold: " << Gold << endl;
 }
 
-int Player::GetLevel() {
+int Player::GetLevel() const {
         return Level;
 }
 
-int Player::GetHP() {
-        return HP;
+int Player::GetMaxHP() const {
+        return MaxHP;
 }
 
-int Player::GetATK() {
+int Player::GetCurrentHP() const {
+        return CurrentHP;
+}
+
+int Player::GetATK() const {
         return ATK;
 }
 
-int Player::GetDEF() {
+int Player::GetDEF() const {
         return DEF;
 }
 
-int Player::GetAG() {
+int Player::GetAG() const {
         return AG;
 }
 
-int Player::GetCurrentEXP() {
+int Player::GetCurrentEXP() const {
         return CurrentEXP;
 }
 
-int Player::GetEXPToNextLevel() {
+int Player::GetEXPToNextLevel() const {
         return EXPToNextLevel;
 }
 
-int Player::GetGold() {
+int Player::GetGold() const {
         return Gold;
 }
 
@@ -50,8 +61,16 @@ void Player::SetLevel(int EnteredLevel) {
         Level = EnteredLevel;
 }
 
-void Player::SetHP(int EnteredHP) {
-        HP = EnteredHP;
+void Player::SetMaxHP(int EnteredHP) {
+        MaxHP = EnteredHP;
+}
+
+void Player::SetCurrentHP(int EnteredHP) {
+        CurrentHP = EnteredHP;
+}
+
+void Player::LowerCurrentHP(int EnteredHP) {
+        CurrentHP -= EnteredHP;
 }
 
 void Player::SetATK(int EnteredATK) {
@@ -73,9 +92,24 @@ void Player::SetCurrentEXP(int EnteredEXP) {
 void Player::AddCurrentEXP(int EnteredEXP) {
         CurrentEXP += EnteredEXP;
         if (CurrentEXP >= EXPToNextLevel) {
+                int StatRaise = 0;
+                StatRaise = distribution(generator);
+                cout << "Your HP went up by " << StatRaise << endl;
+                RaiseMaxHP(StatRaise);
+                StatRaise = distribution(generator);
+                cout << "Your ATK went up by " << StatRaise << endl;
+                RaiseATK(StatRaise);
+                StatRaise = distribution(generator);
+                cout << "Your DEF went up by " << StatRaise << endl;
+                RaiseDEF(StatRaise);
+                StatRaise = distribution(generator);
+                cout << "Your AG went up by " << StatRaise << endl;
+                RaiseAG(StatRaise);
+                RaiseMaxHP(distribution(generator));
                 CurrentEXP = 0;
                 RaiseLevel(1);
                 RaiseEXPToNextLevel();
+                Sleep(600);
         }
 }
 
@@ -103,8 +137,8 @@ void Player::RaiseLevel(int EnteredLevel) {
         Level += EnteredLevel;
 }
 
-void Player::RaiseHP(int EnteredHP) {
-        HP += EnteredHP;
+void Player::RaiseMaxHP(int EnteredHP) {
+        MaxHP += EnteredHP;
 }
 
 void Player::RaiseATK(int EnteredATK) {
