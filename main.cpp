@@ -65,6 +65,8 @@ void Arena();                                                   // The main batt
 bool MonsterTurn(int);                                          // Computes the monster's damage to the player.
 bool PlayerTurn(int);                                           // Computes the players damage to the monster.
 
+void DisplayStats(); //testing
+
 void FillArrayOfMonsterObjects();                               // Creates an array of Monster objects.
 void ClearScreen();                                             // Clears text from the screen. Waits for input to do so.
 void ClearScreenWithoutInput();                                 // Clears text from the screen. Activates when called.
@@ -193,6 +195,35 @@ int main() {
 
 // ---------------------------------------------------------------------- Function Definitions:
 
+
+
+void DisplayStats(){
+    ClearScreenWithoutInput();
+    if (ThePlayer.GetCurrentHP() <= 5){
+        ChangeColor(12);
+
+    }else {
+        ChangeColor(9);
+    }
+    cout << "Player Stats: " << endl;
+            cout << "(HP: " << ThePlayer.GetCurrentHP() << "/MaxHP: " <<ThePlayer.GetMaxHP() << ") (EXP: " << ThePlayer.GetCurrentEXP() 
+                 << ") (Needed EXP: " << ThePlayer.GetEXPToNextLevel() << ") (Gold: " 
+                 << ThePlayer.GetGold() << ")" << endl;
+            cout << Line << endl;
+}
+
+void DisplayMonsterStats(int MonsterNumber) {
+    
+    // Displaying monster health information
+    cout << ArrayOfMonsters[MonsterNumber].GetName() <<" Stats: " << endl;
+            cout << "(Current HP: " << ArrayOfMonsters[MonsterNumber].GetCurrentHP() << ")"<< endl;
+            cout << Line << endl;
+}
+
+
+
+
+
 // The main arena system.
 void Arena() {
     bool PlayerIsAlive = true; 
@@ -213,10 +244,16 @@ void Arena() {
             } else {
                 ChangeColor(9);
             }
-            cout << "(HP: " << ThePlayer.GetCurrentHP() << ") (EXP: " << ThePlayer.GetCurrentEXP() 
+            cout << "Player Stats: " << endl;
+            cout << "(HP: " << ThePlayer.GetCurrentHP() << "/MaxHP: " <<ThePlayer.GetMaxHP() << ") (EXP: " << ThePlayer.GetCurrentEXP() 
                  << ") (Needed EXP: " << ThePlayer.GetEXPToNextLevel() << ") (Gold: " 
                  << ThePlayer.GetGold() << ")" << endl;
             cout << Line << endl;
+            //Displaying monster health information
+            cout << ArrayOfMonsters[i].GetName() <<" Stats: " << endl;
+            cout << "(Current HP: " << ArrayOfMonsters[i].GetCurrentHP() << ")"<< endl;
+            cout << Line << endl;
+
             Sleep(100);
             if (ArrayOfMonsters[i].GetAG() < ThePlayer.GetAG()) {
                 MonsterIsAlive = PlayerTurn(i);
@@ -261,11 +298,11 @@ bool MonsterTurn(int MonsterNumber) {
          << ArrayOfMonsters[MonsterNumber].GetMethodOfAttack()
          << " you for " << DamageDealt << " damage!" << endl;
     ThePlayer.LowerCurrentHP(DamageDealt);
-    Sleep(600);
+    Sleep(2000);
     if (ThePlayer.GetCurrentHP() <= 0) {
         ChangeColor(12);
         cout << "Too bad! You've lost the Gauntlet!" << endl;
-        Sleep(1000);
+        Sleep(800);
         ThePlayer.SetCurrentHP(ThePlayer.GetMaxHP());
         return false;
     } else {
@@ -275,9 +312,9 @@ bool MonsterTurn(int MonsterNumber) {
 
 // The player's turn in which they can choose to attack, use a potion, or give up. Also checks for victory.
 bool PlayerTurn(int MonsterNumber) {
+    PlayerBattleChoice:
     ChangeColor(11);
     cout << "Enter an action: ('a' = ATTACK, 'p' = POTION, 'g' = GIVE UP)" << endl;
-    PlayerBattleChoice:
     cin >> UserInput;
     Validated = Validate(UserInput, "a", "p", "g");
     if (!Validated) {cout << "Invalid entry! Please try again!" << endl; goto PlayerBattleChoice;}
@@ -305,9 +342,180 @@ bool PlayerTurn(int MonsterNumber) {
             return true;
         }
     } else if (UserInput == "p") {
-        ThePlayer.SetCurrentHP(ThePlayer.GetMaxHP());
+        //Creating Variables of the potion values
+        int RedPotionHeal = 10;
+        int BluePotionHeal = 20;
+        int PurplePotionHeal = 30;
+
+        //Setting up new health value
+        int newHealth;
+
+        //Creating User Input variable
+        string ChosenPotion = "";
+        //Displaying current number of potions
+        PotionInventory:
+        ClearScreenWithoutInput();
+        ChangeColor(11);
+        cout << Line << endl;
+        cout << "Potion Inventory" << endl;
+        cout << Line << endl;
+        ChangeColor(4);
+        cout << "You have " << RedPotionsInBag << " Red Potions." << endl;
+        ChangeColor(9);
+        cout << "You have " << BluePotionsInBag << " Blue Potions." << endl;
+        ChangeColor(5);
+        cout << "You have " << PurplePotionsInBag << " Purple Potions." << endl;
+        ChangeColor(11);
+        cout << Line << endl;
+        cout << "Enter the potion you want to use ('r', 'b', 'p') or 'n' to go back: " << endl;
+        cin >> ChosenPotion;
+        
+        //Creating logic of the Red Potion
+        if (ChosenPotion == "r"){
+            //Checking if player has potions to use
+            if (RedPotionsInBag >= 1){
+                ChangeColor(4);
+                cout << "You used a red potion" << endl;
+                newHealth = ThePlayer.GetCurrentHP() + RedPotionHeal;
+                //Checking if player current health won't go over max health. If it will, set current health to max health.
+                if (newHealth > ThePlayer.GetMaxHP()){
+                    ThePlayer.SetCurrentHP(ThePlayer.GetMaxHP());
+                    cout << "You've healed! Current Health: " << ThePlayer.GetCurrentHP() << endl;
+                    //Decrementing the amount of red potions
+                    RedPotionsInBag--;
+                    Sleep(1000);
+                    DisplayStats();
+                    DisplayMonsterStats(MonsterNumber);
+                    
+                    
+
+                }
+                else {
+                    //Setting new value for current health
+                    ThePlayer.SetCurrentHP(ThePlayer.GetCurrentHP() + RedPotionHeal);
+                    cout << "You've healed! Current Health: " << ThePlayer.GetCurrentHP() << endl;
+                    //Decrementing the amount of red potions
+                    RedPotionsInBag--;
+                    Sleep(1000);
+                    DisplayStats();
+                    DisplayMonsterStats(MonsterNumber);
+                    
+                    
+                    
+                }
+
+            }else {
+                cout << "You don't have red potions to use: " <<endl;
+                Sleep(1000);
+                DisplayStats();
+                DisplayMonsterStats(MonsterNumber);
+                
+            }
+            
+
+        }
+        //Creating the logic of the Blue Potion
+        else if (ChosenPotion == "b"){
+            //Checking if player has potions to use
+            if (BluePotionsInBag >= 1){
+                ChangeColor(9);
+                cout << "You used a blue potion" << endl;
+                newHealth = ThePlayer.GetCurrentHP() + BluePotionHeal;
+                //Checking if player current health won't go over max health. If it will, set current health to max health.
+                if (newHealth > ThePlayer.GetMaxHP()){
+                    ThePlayer.SetCurrentHP(ThePlayer.GetMaxHP());
+                    cout << "You've healed! Current Health: " << ThePlayer.GetCurrentHP() << endl;
+                    //Decrementing the amount of Blue potions
+                    BluePotionsInBag--;
+                    Sleep(1000);
+                    DisplayStats();
+                    DisplayMonsterStats(MonsterNumber);
+                    
+                    
+
+                }
+                else {
+                    //Setting new value for current health
+                    ThePlayer.SetCurrentHP(ThePlayer.GetCurrentHP() + BluePotionHeal);
+                    cout << "You've healed! Current Health: " << ThePlayer.GetCurrentHP() << endl;
+                    //Decrementing the amount of Blue potions
+                    BluePotionsInBag--;
+                    Sleep(1000);
+                    DisplayStats();
+                    DisplayMonsterStats(MonsterNumber);
+                    
+                    
+                    
+                }
+
+            }else {
+                cout << "You don't have blue potions to use: " <<endl;
+                Sleep(1000);
+                DisplayStats();
+                DisplayMonsterStats(MonsterNumber);
+                
+            }
+            
+        }
+        //Creating the logic of the Purple Potion
+        else if (ChosenPotion == "p"){
+            //Checking if player has potions to use
+            if (PurplePotionsInBag >= 1){
+                ChangeColor(5);
+                cout << "You used a purple potion" << endl;
+                newHealth = ThePlayer.GetCurrentHP() + PurplePotionHeal;
+                //Checking if player current health won't go over max health. If it will, set current health to max health.
+                if (newHealth > ThePlayer.GetMaxHP()){
+                    ThePlayer.SetCurrentHP(ThePlayer.GetMaxHP());
+                    cout << "You've healed! Current Health: " << ThePlayer.GetCurrentHP() << endl;
+                    //Decrementing the amount of Purple potions
+                    PurplePotionsInBag--;
+                    Sleep(1000);
+                    DisplayStats();
+                    DisplayMonsterStats(MonsterNumber);
+                    
+                    
+
+                }
+                else {
+                    //Setting new value for current health
+                    ThePlayer.SetCurrentHP(ThePlayer.GetCurrentHP() + PurplePotionHeal);
+                    cout << "You've healed! Current Health: " << ThePlayer.GetCurrentHP() << endl;
+                    //Decrementing the amount of Purple potions
+                    PurplePotionsInBag--;
+                    Sleep(1000);
+                    DisplayStats();
+                    DisplayMonsterStats(MonsterNumber);
+                    
+                    
+                    
+                }
+
+            }else {
+                cout << "You don't have purple potions to use: " <<endl;
+                Sleep(1000);
+                DisplayStats();
+                DisplayMonsterStats(MonsterNumber);
+                
+            }
+            
+            
+        }
+        else if (ChosenPotion == "n"){
+            Sleep(500);
+            DisplayStats();
+            DisplayMonsterStats(MonsterNumber);
+            goto PlayerBattleChoice;
+            
+            
+
+        }
+
+
         return true;
-    } else {
+    } 
+    else {
+        main();
         return false;
     }
 }

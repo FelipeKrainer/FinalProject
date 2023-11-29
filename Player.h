@@ -42,5 +42,5 @@ class Player {
         int AG = 5;
         int CurrentEXP = 0;
         int EXPToNextLevel = 5;
-        int Gold = 15;
+        int Gold = 100;
 };

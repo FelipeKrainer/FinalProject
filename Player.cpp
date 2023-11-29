@@ -109,7 +109,7 @@ void Player::AddCurrentEXP(int EnteredEXP) {
                 CurrentEXP = 0;
                 RaiseLevel(1);
                 RaiseEXPToNextLevel();
-                Sleep(600);
+                Sleep(800);
         }
 }
 
