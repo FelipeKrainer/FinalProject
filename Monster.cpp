@@ -4,21 +4,26 @@
 using namespace std;
 
 void Monster::PrintInfo() const {
-    cout <<  "Name: " << Name << endl;
-    cout <<  "Max health: " << HP << endl;
-    cout <<  "Attack: " << ATK << endl;
-    cout <<  "Defence: " << DEF << endl;
-    cout <<  "Agility: " << AG << endl;
-    cout <<  "Experience: " << EXP << endl;
-    cout <<  "Method of attack: " << MethodOfAttack << endl;
+    cout << "Name: " << Name << endl;
+    cout << "Max health: " << MaxHP << endl;
+    cout << "Current health: " << CurrentHP << endl;
+    cout << "Attack: " << ATK << endl;
+    cout << "Defence: " << DEF << endl;
+    cout << "Agility: " << AG << endl;
+    cout << "Experience: " << EXP << endl;
+    cout << "Method of attack: " << MethodOfAttack << endl;
 }
 
 string Monster::GetName() const {
     return Name;
 }
 
-int Monster::GetHP() const {
-    return HP;
+int Monster::GetMaxHP() const {
+    return MaxHP;
+}
+
+int Monster::GetCurrentHP() const {
+    return CurrentHP;
 }
 
 int Monster::GetATK() const {
@@ -37,6 +42,10 @@ int Monster::GetEXP() const {
     return EXP;
 }
 
+int Monster::GetGold() const {
+    return Gold;
+}
+
 string Monster::GetMethodOfAttack() const {
     return MethodOfAttack;
 }
@@ -45,8 +54,16 @@ void Monster::SetName(string EnteredName) {
     Name = EnteredName;
 }
 
-void Monster::SetHP(string EnteredHP) {
-    HP = stoi(EnteredHP);
+void Monster::SetMaxHP(string EnteredHP) {
+    MaxHP = stoi(EnteredHP);
+}
+
+void Monster::SetCurrentHP(int EnteredHP) {
+    CurrentHP = EnteredHP;
+}
+
+void Monster::LowerCurrentHP(int EnteredHP) {
+    CurrentHP -= EnteredHP;
 }
 
 void Monster::SetATK(string EnteredATK) {
@@ -63,6 +80,10 @@ void Monster::SetAG(string EnteredAG) {
 
 void Monster::SetEXP(string EnteredEXP) {
     EXP = stoi(EnteredEXP);
+}
+
+void Monster::SetGold(string EnteredGold) {
+    Gold = stoi(EnteredGold);
 }
 
 void Monster::SetMethodOfAttack(string EnteredMethod) {
