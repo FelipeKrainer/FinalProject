@@ -571,22 +571,22 @@ void Scroll(string Text) {
 // The first frame of the title screen.
 void SwordAnimation1() {
     ClearScreenWithoutInput();
-    ChangeColor(11);
-    cout << "   *                       *       .   _                            .    *      " << endl;
-    cout << "                                      /-\\     .        *                        " << endl;
-    cout << "                     .                \\_/                     .                 " << endl;
-    cout << "    .       *                         |-|                                       " << endl;
-    cout << "                                .     |-|                                       " << endl;
+    ChangeColor(13);
+    cout << "   .          .            .       *   _                            *    .      " << endl;
+    cout << "                                      /-\\     *        .                        " << endl;
+    cout << "                     *                \\_/                                       " << endl;
+    cout << "    *       .                         |-|          .            .               " << endl;
+    cout << "                                *     |-|                                       " << endl;
     ChangeColor(9);
     cout << "                                   __T:::T__                                    " << endl;
-    cout << "          .          *            /__\\___/__\\            .        *        .    " << endl;
-    cout << "                                 //         \\\\                                  " << endl;
-    cout << "       *      .                  U   | / |   U         .                        " << endl;
-    ChangeColor(13);
+    cout << "        .            .            /__\\___/__\\            *        .        *    " << endl;
+    cout << "                         .       //         \\\\                                  " << endl;
+    cout << "       .      *  .               U   | / |   U                                  " << endl;
+    ChangeColor(11);
     cout << "    _               _                |   |                _               _     " << endl;
-    cout << " __/ \\__         __/ \\__             |   |      *      __/ \\__         __/ \\__  " << endl;
-    ChangeColor(5);
-    cout << " \\  _  /    *    \\  _  /     .       | / |             \\  _  /    *    \\  _  /  " << endl;
+    cout << " __/ \\__         __/ \\__             |   |      .      __/ \\__         __/ \\__  " << endl;
+    ChangeColor(15);
+    cout << " \\  _  /    .    \\  _  /     *       | / |             \\  _  /    .    \\  _  /  " << endl;
     cout << "  |/ \\|           |/ \\|              |   |              |/ \\|           |/ \\|  " << endl;
     ChangeColor(9);
     cout << Line << endl;
@@ -601,7 +601,7 @@ void SwordAnimation1() {
 // The second frame of the title screen.
 void SwordAnimation2() {
     ClearScreenWithoutInput();
-    ChangeColor(11);
+    ChangeColor(13);
     cout << "   .          .            .       *   _                            *    .      " << endl;
     cout << "                                      /-\\     *        .                        " << endl;
     cout << "                     *                \\_/                                       " << endl;
@@ -612,10 +612,10 @@ void SwordAnimation2() {
     cout << "        .            .            /__\\___/__\\            *        .        *    " << endl;
     cout << "                         .       //         \\\\                                  " << endl;
     cout << "       .      *  .               U   | / |   U                                  " << endl;
-    ChangeColor(13);
+    ChangeColor(11);
     cout << "    _               _                |   |                _               _     " << endl;
     cout << " __/ \\__         __/ \\__             |   |      .      __/ \\__         __/ \\__  " << endl;
-    ChangeColor(5);
+    ChangeColor(15);
     cout << " \\  _  /    .    \\  _  /     *       | / |             \\  _  /    .    \\  _  /  " << endl;
     cout << "  |/ \\|           |/ \\|              |   |              |/ \\|           |/ \\|  " << endl;
     ChangeColor(9);
