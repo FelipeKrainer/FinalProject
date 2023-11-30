@@ -56,6 +56,7 @@ int BluePotionHeal = 20;                                                        
 int PurplePotionHeal = 30;                                                                               // -
 
 int CurrentArena = 0;                                                                                    // The arena the player is currently in.
+bool HasRunAway = false;                                                                                 // Holds whether the player has given up on an arena.
 
 bool Arena1Beat = false;                                                                                 // Whether the player has beat a given arena.
 bool Arena2Beat = false;                                                                                 // -
@@ -93,6 +94,7 @@ bool Validate(string, string, string);                          // Validate inpu
 
 int main() {
     FillArrayOfMonsterObjects();
+    HasRunAway = false;
     Introduction();
     std::cout << "Press Enter to begin..." << endl;
     MainMenu: 
@@ -262,6 +264,9 @@ void Arena() {
             Sleep(100);
             if (ArrayOfMonsters[i].GetAG() < ThePlayer.GetAG()) {
                 MonsterIsAlive = PlayerTurn(i);
+                if (HasRunAway) {
+                    break;
+                }
                 if (MonsterIsAlive) {
                     PlayerIsAlive = MonsterTurn(i);
                 } 
@@ -274,11 +279,11 @@ void Arena() {
             
         }
         MonsterIsAlive = true;
-        if (PlayerIsAlive == false) {
+        if (PlayerIsAlive == false || HasRunAway == true) {
             break;
         }
     }
-    if (PlayerIsAlive) {
+    if (PlayerIsAlive && HasRunAway == false) {
         cout << Line << endl;
         cout << "You beat the Gauntlet!" << endl;
         switch (CurrentArena) {
@@ -387,7 +392,8 @@ bool PlayerTurn(int MonsterNumber) {
         return true;
     } 
     else {
-        return false;
+        HasRunAway = true;
+        return true;
     }
 }
 
