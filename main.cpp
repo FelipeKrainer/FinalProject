@@ -51,6 +51,10 @@ int RedPotionCost = 10;                                                         
 int BluePotionCost = 20;                                                                                 // -
 int PurplePotionCost = 30;                                                                               // -
 
+int RedPotionHeal = 10;                                                                                  // The amount a given potion heals.
+int BluePotionHeal = 20;                                                                                 // -
+int PurplePotionHeal = 30;                                                                               // -
+
 int CurrentArena = 0;                                                                                    // The arena the player is currently in.
 
 bool Arena1Beat = false;                                                                                 // Whether the player has beat a given arena.
@@ -76,6 +80,7 @@ void SwordAnimation1();                                         // Title animati
 void SwordAnimation2();                                         // Title animation.
 void Introduction();                                            // Text introducing the game.
 void PotionScreen();                                            // Displays the potion shop.
+void BattlePotionMenu(string, int, int);                        // Displays the in-battle potion menu.
 void ArenaMenuPage1();                                          // Displays Arena options menu 1.
 void ArenaMenuPage2();                                          // Displays Arena options menu 2.
 
@@ -342,166 +347,46 @@ bool PlayerTurn(int MonsterNumber) {
             return true;
         }
     } else if (UserInput == "p") {
-        //Creating Variables of the potion values
-        int RedPotionHeal = 10;
-        int BluePotionHeal = 20;
-        int PurplePotionHeal = 30;
-
-        //Setting up new health value
-        int newHealth;
-
         //Creating User Input variable
         string ChosenPotion = "";
         //Displaying current number of potions
         PotionInventory:
         ClearScreenWithoutInput();
         ChangeColor(11);
-        cout << Line << endl;
-        cout << "Potion Inventory" << endl;
-        cout << Line << endl;
+        std::cout << Line << endl;
+        std::cout << "Potion Inventory" << endl;
+        std::cout << Line << endl;
         ChangeColor(4);
-        cout << "You have " << RedPotionsInBag << " Red Potions." << endl;
+        std::cout << "You have " << RedPotionsInBag << " Red Potion(s)." << endl;
         ChangeColor(9);
-        cout << "You have " << BluePotionsInBag << " Blue Potions." << endl;
+        std::cout << "You have " << BluePotionsInBag << " Blue Potion(s)." << endl;
         ChangeColor(5);
-        cout << "You have " << PurplePotionsInBag << " Purple Potions." << endl;
+        std::cout << "You have " << PurplePotionsInBag << " Purple Potion(s)." << endl;
         ChangeColor(11);
-        cout << Line << endl;
-        cout << "Enter the potion you want to use ('r', 'b', 'p') or 'n' to go back: " << endl;
-        cin >> ChosenPotion;
+        std::cout << Line << endl;
+        PotionInventoryInput:
+        std::cout << "Enter the potion you want to use ('r', 'b', 'p') or 'n' to go back: " << endl;
+        cin >> UserInput;
+        Validated = Validate(UserInput, "r", "b", "p", "n");
+        if (!Validated) {cout << "Invalid entry! Please try again!" << endl; goto PotionInventoryInput;}
         
         //Creating logic of the Red Potion
-        if (ChosenPotion == "r"){
-            //Checking if player has potions to use
-            if (RedPotionsInBag >= 1){
-                ChangeColor(4);
-                cout << "You used a red potion" << endl;
-                newHealth = ThePlayer.GetCurrentHP() + RedPotionHeal;
-                //Checking if player current health won't go over max health. If it will, set current health to max health.
-                if (newHealth > ThePlayer.GetMaxHP()){
-                    ThePlayer.SetCurrentHP(ThePlayer.GetMaxHP());
-                    cout << "You've healed! Current Health: " << ThePlayer.GetCurrentHP() << endl;
-                    //Decrementing the amount of red potions
-                    RedPotionsInBag--;
-                    Sleep(1000);
-                    DisplayStats();
-                    DisplayMonsterStats(MonsterNumber);
-                }
-                else {
-                    //Setting new value for current health
-                    ThePlayer.SetCurrentHP(ThePlayer.GetCurrentHP() + RedPotionHeal);
-                    cout << "You've healed! Current Health: " << ThePlayer.GetCurrentHP() << endl;
-                    //Decrementing the amount of red potions
-                    RedPotionsInBag--;
-                    Sleep(1000);
-                    DisplayStats();
-                    DisplayMonsterStats(MonsterNumber);
-                }
-
-            }else {
-                cout << "You don't have red potions to use: " <<endl;
-                Sleep(1000);
-                DisplayStats();
-                DisplayMonsterStats(MonsterNumber);
-                
-            }
-        }
+        if (UserInput == "r"){
+            BattlePotionMenu("Red", RedPotionHeal, MonsterNumber);
         //Creating the logic of the Blue Potion
-        else if (ChosenPotion == "b"){
-            //Checking if player has potions to use
-            if (BluePotionsInBag >= 1){
-                ChangeColor(9);
-                cout << "You used a blue potion" << endl;
-                newHealth = ThePlayer.GetCurrentHP() + BluePotionHeal;
-                //Checking if player current health won't go over max health. If it will, set current health to max health.
-                if (newHealth > ThePlayer.GetMaxHP()){
-                    ThePlayer.SetCurrentHP(ThePlayer.GetMaxHP());
-                    cout << "You've healed! Current Health: " << ThePlayer.GetCurrentHP() << endl;
-                    //Decrementing the amount of Blue potions
-                    BluePotionsInBag--;
-                    Sleep(1000);
-                    DisplayStats();
-                    DisplayMonsterStats(MonsterNumber);
-                }
-                else {
-                    //Setting new value for current health
-                    ThePlayer.SetCurrentHP(ThePlayer.GetCurrentHP() + BluePotionHeal);
-                    cout << "You've healed! Current Health: " << ThePlayer.GetCurrentHP() << endl;
-                    //Decrementing the amount of Blue potions
-                    BluePotionsInBag--;
-                    Sleep(1000);
-                    DisplayStats();
-                    DisplayMonsterStats(MonsterNumber);
-                }
-
-            }else {
-                cout << "You don't have blue potions to use: " <<endl;
-                Sleep(1000);
-                DisplayStats();
-                DisplayMonsterStats(MonsterNumber);
-                
-            }
-            
-        }
+        } else if (UserInput == "b"){
+            BattlePotionMenu("Blue", BluePotionHeal, MonsterNumber);
         //Creating the logic of the Purple Potion
-        else if (ChosenPotion == "p"){
-            //Checking if player has potions to use
-            if (PurplePotionsInBag >= 1){
-                ChangeColor(5);
-                cout << "You used a purple potion" << endl;
-                newHealth = ThePlayer.GetCurrentHP() + PurplePotionHeal;
-                //Checking if player current health won't go over max health. If it will, set current health to max health.
-                if (newHealth > ThePlayer.GetMaxHP()){
-                    ThePlayer.SetCurrentHP(ThePlayer.GetMaxHP());
-                    cout << "You've healed! Current Health: " << ThePlayer.GetCurrentHP() << endl;
-                    //Decrementing the amount of Purple potions
-                    PurplePotionsInBag--;
-                    Sleep(1000);
-                    DisplayStats();
-                    DisplayMonsterStats(MonsterNumber);
-                    
-                    
-
-                }
-                else {
-                    //Setting new value for current health
-                    ThePlayer.SetCurrentHP(ThePlayer.GetCurrentHP() + PurplePotionHeal);
-                    cout << "You've healed! Current Health: " << ThePlayer.GetCurrentHP() << endl;
-                    //Decrementing the amount of Purple potions
-                    PurplePotionsInBag--;
-                    Sleep(1000);
-                    DisplayStats();
-                    DisplayMonsterStats(MonsterNumber);
-                    
-                    
-                    
-                }
-
-            }else {
-                cout << "You don't have purple potions to use: " <<endl;
-                Sleep(1000);
-                DisplayStats();
-                DisplayMonsterStats(MonsterNumber);
-                
-            }
-            
-            
-        }
-        else if (ChosenPotion == "n"){
-            Sleep(500);
+        } else if (UserInput == "p"){
+            BattlePotionMenu("Purple", PurplePotionHeal, MonsterNumber);
+        } else {
             DisplayStats();
             DisplayMonsterStats(MonsterNumber);
             goto PlayerBattleChoice;
-            
-            
-
         }
-
-
         return true;
     } 
     else {
-        main();
         return false;
     }
 }
@@ -572,21 +457,21 @@ void Scroll(string Text) {
 void SwordAnimation1() {
     ClearScreenWithoutInput();
     ChangeColor(13);
-    cout << "   .          .            .       *   _                            *    .      " << endl;
-    cout << "                                      /-\\     *        .                        " << endl;
-    cout << "                     *                \\_/                                       " << endl;
-    cout << "    *       .                         |-|          .            .               " << endl;
-    cout << "                                *     |-|                                       " << endl;
+    cout << "   *                       *       .   _                            .    *      " << endl;
+    cout << "                                      /-\\     .        *                        " << endl;
+    cout << "                     .                \\_/                     .                 " << endl;
+    cout << "    .       *                         |-|                                       " << endl;
+    cout << "                                .     |-|                                       " << endl;
     ChangeColor(9);
     cout << "                                   __T:::T__                                    " << endl;
-    cout << "        .            .            /__\\___/__\\            *        .        *    " << endl;
-    cout << "                         .       //         \\\\                                  " << endl;
-    cout << "       .      *  .               U   | / |   U                                  " << endl;
+    cout << "          .          *            /__\\___/__\\            .        *        .    " << endl;
+    cout << "                                 //         \\\\                                  " << endl;
+    cout << "       *      .                  U   | / |   U         .                        " << endl;
     ChangeColor(11);
     cout << "    _               _                |   |                _               _     " << endl;
-    cout << " __/ \\__         __/ \\__             |   |      .      __/ \\__         __/ \\__  " << endl;
+    cout << " __/ \\__         __/ \\__             |   |      *      __/ \\__         __/ \\__  " << endl;
     ChangeColor(15);
-    cout << " \\  _  /    .    \\  _  /     *       | / |             \\  _  /    .    \\  _  /  " << endl;
+    cout << " \\  _  /    *    \\  _  /     .       | / |             \\  _  /    *    \\  _  /  " << endl;
     cout << "  |/ \\|           |/ \\|              |   |              |/ \\|           |/ \\|  " << endl;
     ChangeColor(9);
     cout << Line << endl;
@@ -661,6 +546,37 @@ void PotionScreen() {
     cout << Line << endl;
     ChangeColor(11);
     cout << "Enter the type of potion you want:" << endl;
+}
+
+void BattlePotionMenu(string PotionColor, int PotionHealAmount, int MonsterNumber) {
+    int PotionsInBag;
+    if (PotionColor == "Red") {PotionsInBag = RedPotionsInBag;} 
+    else if (PotionColor == "Blue") {PotionsInBag = BluePotionsInBag;}
+    else{PotionsInBag = PurplePotionsInBag;};
+    if (PotionsInBag >= 1){
+                ChangeColor(4);
+                std::cout << "You used a " << PotionColor << " Potion!" << endl;
+                ThePlayer.SetCurrentHP(ThePlayer.GetCurrentHP() + PotionHealAmount);
+                //Checking if player current health won't go over max health. If it will, set current health to max health.
+                if (ThePlayer.GetCurrentHP() > ThePlayer.GetMaxHP()) {
+                    ThePlayer.SetCurrentHP(ThePlayer.GetMaxHP());
+                }
+                std::cout << "You've healed! Current Health: " << ThePlayer.GetCurrentHP() << endl;
+                    //Decrementing the amount of red potions
+                if (PotionColor == "Red") {RedPotionsInBag--;}
+                else if (PotionColor == "Blue") {BluePotionsInBag--;}
+                else{PurplePotionsInBag--;}
+                
+                Sleep(1000);
+                DisplayStats();
+                DisplayMonsterStats(MonsterNumber);
+
+    } else {
+        std::cout << "You don't have any " << PotionColor << " Potions to use! " <<endl;
+        Sleep(1000);
+        DisplayStats();
+        DisplayMonsterStats(MonsterNumber);
+    }
 }
 
 // Prints text showing the first arena menu.
