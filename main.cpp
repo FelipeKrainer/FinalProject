@@ -2,12 +2,13 @@
 // Run in the Command Prompt in the folder containing the "Monster.h", "Monster.cpp", and "TurnBasedBattleSystem.cpp" files.
 
 /* Still to be added:
-    In-battle potion use
-    In-battle running
-    Miss chance for player and monsters
-    Variable damage
+    In-battle potion use ✓
+    In-battle running ✓
+    Miss chance for player and monsters ✓
+    Variable damage ✓
+    Menu graphic ✓
     Battle graphic
-    Eighteen monster data entries
+    Eighteen monster data entries ✓
     Balancing difficulty
     Save Player values and relevant in-game variables to a text file.
     Load Player values and relevant in-game variables from a text file.
@@ -17,6 +18,7 @@
 #include "Monster.h"
 #include "Player.h"
 #include <iostream>
+#include <random>
 #include <windows.h>
 #include <fstream>
 
@@ -33,6 +35,11 @@ const std::string OS = "Unknown";
 #endif
 
 using namespace std;
+
+std::random_device Rand;
+std::mt19937 Generator(Rand());
+std::uniform_int_distribution<int> Distribution(1, 20);
+std::uniform_int_distribution<int> DamageDistribution(0, 3);
 
 int const AMOUNT_OF_MONSTERS = 18;                                                                       // The amount of monsters in the game.
 string QUIT = "99";                                                                                      // Used to quit the game when asked.
@@ -51,9 +58,9 @@ int RedPotionCost = 10;                                                         
 int BluePotionCost = 20;                                                                                 // -
 int PurplePotionCost = 30;                                                                               // -
 
-int RedPotionHeal = 10;                                                                                  // The amount a given potion heals.
-int BluePotionHeal = 20;                                                                                 // -
-int PurplePotionHeal = 30;                                                                               // -
+int RedPotionHeal = 16;                                                                                  // The amount a given potion heals.
+int BluePotionHeal = 32;                                                                                 // -
+int PurplePotionHeal = 48;                                                                               // -
 
 int CurrentArena = 0;                                                                                    // The arena the player is currently in.
 bool HasRunAway = false;                                                                                 // Holds whether the player has given up on an arena.
@@ -80,6 +87,8 @@ void Scroll(string);                                            // Prints text o
 void SwordAnimation1();                                         // Title animation.
 void SwordAnimation2();                                         // Title animation.
 void Introduction();                                            // Text introducing the game.
+void MainMenu();                                                // The main menu image and text.
+void CH(string, int);                                           // Prints the entered chunk of text in the entered color.
 void PotionScreen();                                            // Displays the potion shop.
 void BattlePotionMenu(string, int, int);                        // Displays the in-battle potion menu.
 void ArenaMenuPage1();                                          // Displays Arena options menu 1.
@@ -98,11 +107,10 @@ int main() {
     Introduction();
     std::cout << "Press Enter to begin..." << endl;
     MainMenu: 
+    ThePlayer.SetCurrentHP(ThePlayer.GetMaxHP());
     ClearScreen();
     ChangeColor(11);
-    std::cout << Line << endl;
-    std::cout << "Enter whether you want to start a Gauntlet ('g'), or buy potions ('p'): " << endl;
-    std::cout << Line << endl;
+    MainMenu();
     MainMenuInput:                                                                                                  // The main menu option box.
     cin >> UserInput;
     Validated = Validate(UserInput, "g", "p");
@@ -204,7 +212,7 @@ int main() {
 
 
 
-void DisplayStats(){
+void DisplayStats(int MonsterNumber){
     ClearScreenWithoutInput();
     if (ThePlayer.GetCurrentHP() <= 5){
         ChangeColor(12);
@@ -212,24 +220,15 @@ void DisplayStats(){
     }else {
         ChangeColor(9);
     }
-    cout << "Player Stats: " << endl;
-            cout << "(HP: " << ThePlayer.GetCurrentHP() << "/MaxHP: " <<ThePlayer.GetMaxHP() << ") (EXP: " << ThePlayer.GetCurrentEXP() 
-                 << ") (Needed EXP: " << ThePlayer.GetEXPToNextLevel() << ") (Gold: " 
-                 << ThePlayer.GetGold() << ")" << endl;
-            cout << Line << endl;
-}
-
-void DisplayMonsterStats(int MonsterNumber) {
-    
+    cout << "Player Stats: (HP: " << ThePlayer.GetCurrentHP() << "/" <<ThePlayer.GetMaxHP() 
+         << ") (EXP: " << ThePlayer.GetCurrentEXP() << ") (Needed EXP: " << ThePlayer.GetEXPToNextLevel() 
+         << ") (Gold: " << ThePlayer.GetGold() << ")" << endl;
+    cout << Line << endl;
     // Displaying monster health information
-    cout << ArrayOfMonsters[MonsterNumber].GetName() <<" Stats: " << endl;
-            cout << "(Current HP: " << ArrayOfMonsters[MonsterNumber].GetCurrentHP() << ")"<< endl;
-            cout << Line << endl;
+    cout << ArrayOfMonsters[MonsterNumber].GetName() <<" Stats: (Current HP: "
+         << ArrayOfMonsters[MonsterNumber].GetCurrentHP() << ")"<< endl;
+    cout << Line << endl;
 }
-
-
-
-
 
 // The main arena system.
 void Arena() {
@@ -237,10 +236,11 @@ void Arena() {
     bool PlayerIsDead = false; 
     bool MonsterIsAlive = true;
     int CurrentMonster = (CurrentArena - 1) * 6;
+    int CurrentRound = 1;
     for (int i = CurrentMonster; i < CurrentMonster + 6; i++) {
         ClearScreenWithoutInput();
         ChangeColor(10);
-        cout << "Round " << i + 1 << ": " << ArrayOfMonsters[i].GetName() << endl;
+        cout << "Round " << CurrentRound << ": " << ArrayOfMonsters[i].GetName() << endl;
         Sleep(3000);
         ArrayOfMonsters[i].SetCurrentHP(ArrayOfMonsters[i].GetMaxHP());
 
@@ -251,16 +251,7 @@ void Arena() {
             } else {
                 ChangeColor(9);
             }
-            cout << "Player Stats: " << endl;
-            cout << "(HP: " << ThePlayer.GetCurrentHP() << "/MaxHP: " <<ThePlayer.GetMaxHP() << ") (EXP: " << ThePlayer.GetCurrentEXP() 
-                 << ") (Needed EXP: " << ThePlayer.GetEXPToNextLevel() << ") (Gold: " 
-                 << ThePlayer.GetGold() << ")" << endl;
-            cout << Line << endl;
-            //Displaying monster health information
-            cout << ArrayOfMonsters[i].GetName() <<" Stats: " << endl;
-            cout << "(Current HP: " << ArrayOfMonsters[i].GetCurrentHP() << ")"<< endl;
-            cout << Line << endl;
-
+            DisplayStats(i);
             Sleep(100);
             if (ArrayOfMonsters[i].GetAG() < ThePlayer.GetAG()) {
                 MonsterIsAlive = PlayerTurn(i);
@@ -276,9 +267,11 @@ void Arena() {
                     MonsterIsAlive = PlayerTurn(i);
                 } 
             }
+            Sleep(600);
             
         }
         MonsterIsAlive = true;
+        CurrentRound += 1;
         if (PlayerIsAlive == false || HasRunAway == true) {
             break;
         }
@@ -298,24 +291,32 @@ void Arena() {
 
 // The monster's attack. Computes damage with MonsterATK - PlayerDEF. Also checks for game over.
 bool MonsterTurn(int MonsterNumber) {
-    int DamageDealt;
-    DamageDealt = ArrayOfMonsters[MonsterNumber].GetATK() - ThePlayer.GetDEF();
-    if (DamageDealt <= 0) {
-        DamageDealt = 1;
-    }
-    ChangeColor(12);
-    cout << ArrayOfMonsters[MonsterNumber].GetName() << " "
-         << ArrayOfMonsters[MonsterNumber].GetMethodOfAttack()
-         << " you for " << DamageDealt << " damage!" << endl;
-    ThePlayer.LowerCurrentHP(DamageDealt);
-    Sleep(2000);
-    if (ThePlayer.GetCurrentHP() <= 0) {
+    int MissChance = 0;
+    MissChance = Distribution(Generator);
+    if (MissChance != 20) {
+        int DamageDealt;
+        DamageDealt = (ArrayOfMonsters[MonsterNumber].GetATK() - ThePlayer.GetDEF()) + DamageDistribution(Generator);
+        if (DamageDealt <= 0) {
+            DamageDealt = 1;
+        }
         ChangeColor(12);
-        cout << "Too bad! You've lost the Gauntlet!" << endl;
-        Sleep(800);
-        ThePlayer.SetCurrentHP(ThePlayer.GetMaxHP());
-        return false;
+        cout << ArrayOfMonsters[MonsterNumber].GetName() << " "
+            << ArrayOfMonsters[MonsterNumber].GetMethodOfAttack()
+            << " you for " << DamageDealt << " damage!" << endl;
+        ThePlayer.LowerCurrentHP(DamageDealt);
+        Sleep(200);
+        if (ThePlayer.GetCurrentHP() <= 0) {
+            ChangeColor(12);
+            cout << "Too bad! You've lost the Gauntlet!" << endl;
+            Sleep(2000);
+            ThePlayer.SetCurrentHP(ThePlayer.GetMaxHP());
+            return false;
+        } else {
+            return true;
+        }
     } else {
+        ChangeColor(13);
+        cout << ArrayOfMonsters[MonsterNumber].GetName() << " misses!" << endl;
         return true;
     }
 }
@@ -329,26 +330,36 @@ bool PlayerTurn(int MonsterNumber) {
     Validated = Validate(UserInput, "a", "p", "g");
     if (!Validated) {cout << "Invalid entry! Please try again!" << endl; goto PlayerBattleChoice;}
     if (UserInput == "a") {
-        int DamageDealt;
-        DamageDealt = ThePlayer.GetATK() - ArrayOfMonsters[MonsterNumber].GetDEF();
-        if (DamageDealt <= 0) {
-            DamageDealt = 1;
-        }
-        ChangeColor(9);
-        cout << "You hit the enemy for " << DamageDealt << " damage!" << endl;
-        ArrayOfMonsters[MonsterNumber].LowerCurrentHP(DamageDealt);
-        Sleep(600);
-        if (ArrayOfMonsters[MonsterNumber].GetCurrentHP() <= 0) {
-            ChangeColor(14);
-            cout << "You've won!" << endl;
-            cout << "You've gained " << ArrayOfMonsters[MonsterNumber].GetEXP() << " EXP and " 
-                 << ArrayOfMonsters[MonsterNumber].GetGold() << " gold!" << endl;
-            ThePlayer.AddCurrentEXP(ArrayOfMonsters[MonsterNumber].GetEXP());
-            ThePlayer.RaiseGold(ArrayOfMonsters[MonsterNumber].GetGold());
-            Sleep(1000);
-            ArrayOfMonsters[MonsterNumber].SetCurrentHP(ArrayOfMonsters[MonsterNumber].GetMaxHP());
-            return false;
+        int MissChance = 0;
+        MissChance = Distribution(Generator);
+        if (MissChance != 20) {
+
+            int DamageDealt;
+            DamageDealt = (ThePlayer.GetATK() - ArrayOfMonsters[MonsterNumber].GetDEF()) + DamageDistribution(Generator);
+            if (DamageDealt <= 0) {
+                DamageDealt = 1;
+            }
+            ChangeColor(9);
+            cout << "You hit the enemy for " << DamageDealt << " damage!" << endl;
+            ArrayOfMonsters[MonsterNumber].LowerCurrentHP(DamageDealt);
+            Sleep(200);
+            if (ArrayOfMonsters[MonsterNumber].GetCurrentHP() <= 0) {
+                ChangeColor(14);
+                cout << "You've won!" << endl;
+                cout << "You've gained " << ArrayOfMonsters[MonsterNumber].GetEXP() << " EXP and " 
+                    << ArrayOfMonsters[MonsterNumber].GetGold() << " gold!" << endl;
+                ThePlayer.AddCurrentEXP(ArrayOfMonsters[MonsterNumber].GetEXP());
+                ThePlayer.RaiseGold(ArrayOfMonsters[MonsterNumber].GetGold());
+                Sleep(1000);
+                ArrayOfMonsters[MonsterNumber].SetCurrentHP(ArrayOfMonsters[MonsterNumber].GetMaxHP());
+                return false;
+            } else {
+                return true;
+            }
         } else {
+            ChangeColor(13);
+            cout << "You missed!" << endl;
+            Sleep(200);
             return true;
         }
     } else if (UserInput == "p") {
@@ -385,13 +396,14 @@ bool PlayerTurn(int MonsterNumber) {
         } else if (UserInput == "p"){
             BattlePotionMenu("Purple", PurplePotionHeal, MonsterNumber);
         } else {
-            DisplayStats();
-            DisplayMonsterStats(MonsterNumber);
+            DisplayStats(MonsterNumber);
             goto PlayerBattleChoice;
         }
         return true;
     } 
     else {
+        cout << "You have given up the fight!";
+        Sleep(2000);
         HasRunAway = true;
         return true;
     }
@@ -530,6 +542,38 @@ void Introduction() {
     }
 }
 
+// Prints the main menu screen. Each CH() call is changing the color of the text inside it (CH defined below).
+void MainMenu() {
+    // ...Yes, it's gross looking...
+    // ...Yes, it's probably not done with coding 'best practices'...
+    // ...Yes, I might lose points for this function... 
+    // But I still like how it outputs to the screen.
+    ChangeColor(9);
+    cout << "        .                                         .                .            " << endl;
+    CH("                    .          .  ",11);CH("  /  ",12);CH("                         .               ",11);cout << endl;
+    CH("           '    ,         .     ", 15);CH("   /", 12);CH("        '   .      +   .         .          ", 15);cout << endl;
+    CH("          _   _   _            ", 15);CH("  _/  ", 12);CH("    .         .              ____ T         ", 15);cout << endl;
+    CH("         | |_| |_| |         . ", 15);CH("  /\\ _/\\_   ", 12);CH("               .      / +  \\|         ", 15);cout << endl;
+    CH("         \\         /   '  +    ", 15);CH("    \\{* }   ", 12);CH("       .            ./______\\         ", 15);cout << endl;
+    CH("          |  ___  |           '", 15);CH("     /YY\\\\__", 12);CH(".            .   ,    |__ X|          ", 15);cout << endl;
+    CH("        -_| _| |_ |__     .    ", 11);CH("     |==|   |", 12);CH("                   __|||-_|_         ", 11);cout << endl;
+    CH("         _-__        \\------- -", 9);CH("     /  \\\\_/ ", 12);CH(".	      +     _-/   _  -           ", 9);cout << endl;
+    CH("             \\__    ____\\__-_____-", 9);CH("  |/\\|  ", 12);CH("___  -   --------/ __ /                ", 9);cout << endl;
+    CH("                _-_/           ", 1);CH("    <=  =>   ", 12);CH(" \\__|___-_=_                         ", 1);cout << endl;
+    cout << "        ---====/                                        \\=======--------        " << endl;
+    ChangeColor(9);
+    std::cout << Line << endl;
+    std::cout << "Enter whether you want to start a Gauntlet ('g'), or buy potions ('p'): " << endl;
+    std::cout << Line << endl;
+
+}
+
+// Accepts a string to print and a color to print it in.
+void CH (string Chunk, int Color) {
+    ChangeColor(Color);
+    cout << Chunk;
+}
+
 // Prints text showing the potion shop menu.
 void PotionScreen() {
     ChangeColor(14);
@@ -560,28 +604,25 @@ void BattlePotionMenu(string PotionColor, int PotionHealAmount, int MonsterNumbe
     else if (PotionColor == "Blue") {PotionsInBag = BluePotionsInBag;}
     else{PotionsInBag = PurplePotionsInBag;};
     if (PotionsInBag >= 1){
-                ChangeColor(4);
-                std::cout << "You used a " << PotionColor << " Potion!" << endl;
-                ThePlayer.SetCurrentHP(ThePlayer.GetCurrentHP() + PotionHealAmount);
-                //Checking if player current health won't go over max health. If it will, set current health to max health.
-                if (ThePlayer.GetCurrentHP() > ThePlayer.GetMaxHP()) {
-                    ThePlayer.SetCurrentHP(ThePlayer.GetMaxHP());
-                }
-                std::cout << "You've healed! Current Health: " << ThePlayer.GetCurrentHP() << endl;
-                    //Decrementing the amount of red potions
-                if (PotionColor == "Red") {RedPotionsInBag--;}
-                else if (PotionColor == "Blue") {BluePotionsInBag--;}
-                else{PurplePotionsInBag--;}
+        ChangeColor(4);
+        std::cout << "You used a " << PotionColor << " Potion!" << endl;
+        ThePlayer.SetCurrentHP(ThePlayer.GetCurrentHP() + PotionHealAmount);
+        //Checking if player current health won't go over max health. If it will, set current health to max health.
+        if (ThePlayer.GetCurrentHP() > ThePlayer.GetMaxHP()) {
+            ThePlayer.SetCurrentHP(ThePlayer.GetMaxHP());
+        }
+        std::cout << "You've healed! Current Health: " << ThePlayer.GetCurrentHP() << endl;
+            //Decrementing the amount of red potions
+        if (PotionColor == "Red") {RedPotionsInBag--;}
+        else if (PotionColor == "Blue") {BluePotionsInBag--;}
+        else{PurplePotionsInBag--;}
                 
-                Sleep(1000);
-                DisplayStats();
-                DisplayMonsterStats(MonsterNumber);
-
+        Sleep(1000);
+        DisplayStats(MonsterNumber);
     } else {
         std::cout << "You don't have any " << PotionColor << " Potions to use! " <<endl;
         Sleep(1000);
-        DisplayStats();
-        DisplayMonsterStats(MonsterNumber);
+        DisplayStats(MonsterNumber);
     }
 }
 
