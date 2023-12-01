@@ -10,7 +10,7 @@
     Battle graphic
     Eighteen monster data entries ✓
     Balancing difficulty
-    Save Player values and relevant in-game variables to a text file.
+    Save Player values and relevant in-game variables to a text file. ✓
     Load Player values and relevant in-game variables from a text file.
     
 */
@@ -42,11 +42,12 @@ std::mt19937 Generator(Rand());
 std::uniform_int_distribution<int> Distribution(1, 20);
 std::uniform_int_distribution<int> DamageDistribution(0, 3);
 
-int const AMOUNT_OF_MONSTERS = 40;                                                                       // The amount of monsters in the game.
+int const AMOUNT_OF_MONSTERS = 36;                                                                       // The amount of monsters in the game.
 string QUIT = "99";                                                                                      // Used to quit the game when asked.
 string UserInput = "";                                                                                   // Used to decide what action to take in the menus.
 string Line = "--------------------------------------------------------------------------------";        // Used to separate output.
 Monster ArrayOfMonsters[AMOUNT_OF_MONSTERS];                                                             // An array of Monster objects.
+string ArrayOfMonsterSprites[AMOUNT_OF_MONSTERS][8];                                                     // An array holding the battle sprite of each monster.
 Player ThePlayer;                                                                                        // The player object. Holds and manipulates player stats.
 bool Validated = false;                                                                                  // Used to hold the return value from Validate().
 string Text = "";                                                                                        // Used to hold text to be printed one character at a time.
@@ -78,12 +79,13 @@ void Arena();                                                   // The main batt
 bool MonsterTurn(int);                                          // Computes the monster's damage to the player.
 bool PlayerTurn(int);                                           // Computes the players damage to the monster.
 
-void DisplayStats();                                            // Displays Player and Monster stats.
+void DisplayStats(int);                                         // Displays Player and Monster stats.
 std::string toLowerCase(const std::string &str);                // Changes user input to lower case.
 void SaveToFile(const std::string& fileName);                   // Saves the player stats
 void LoadFromFile(const std::string& fileName);
 void SaveScreen();                                              // Save Screen
 void FillArrayOfMonsterObjects();                               // Creates an array of Monster objects.
+void FillArrayOfMonsterSprites();                               // Fills the ArrayOfMonsterSprites with data from the MonsterSprites.txt file.
 void ClearScreen();                                             // Clears text from the screen. Waits for input to do so.
 void ClearScreenWithoutInput();                                 // Clears text from the screen. Activates when called.
 void ChangeColor(int);                                          // Changes the text color.
@@ -107,6 +109,7 @@ bool Validate(string, string, string);                          // Validate inpu
 
 int main() {
     FillArrayOfMonsterObjects();
+    FillArrayOfMonsterSprites();
     HasRunAway = false;
     Introduction();
     std::cout << "Press Enter to begin..." << endl;
@@ -240,7 +243,7 @@ int main() {
 // ---------------------------------------------------------------------- Function Definitions:
 
 
-//Function to convert a string to lowercase
+// Function to convert a string to lowercase
 std::string toLowerCase(const std::string& str) {
     std::string result = str;
     for (char& c : result) {
@@ -249,6 +252,7 @@ std::string toLowerCase(const std::string& str) {
     return result;
 }
 
+// Saves relevant variables to a text file.
 void SaveToFile(const std::string& fileName) {
         std::ofstream outFile(fileName, std::ios::out);
 
@@ -278,7 +282,7 @@ void SaveToFile(const std::string& fileName) {
         }
 }
 
-
+// Loads data from a save file and inputs it into relevant variables.
 void LoadFromFile(const std::string& fileName) {
         std::ifstream inFile(fileName, std::ios::in);
         int level;
@@ -292,25 +296,10 @@ void LoadFromFile(const std::string& fileName) {
         
 
         if (inFile.is_open()) {
-            inFile >> level
-                   >> maxHP
-                   >> ATK
-                   >> DEF
-                   >> AG
-                   >> currentEXP
-                   >> expToNextLevel
-                   >> gold
-                   >> RedPotionsInBag
-                   >> BluePotionsInBag
-                   >> PurplePotionsInBag
-                   >> RedPotionCost
-                   >> BluePotionCost
-                   >> PurplePotionCost
-                   >> Arena1Beat
-                   >> Arena2Beat
-                   >> Arena3Beat
-                   >> Arena4Beat
-                   >> Arena5Beat;
+            inFile >> level >> maxHP >> ATK >> DEF >> AG >> currentEXP >> expToNextLevel
+                   >> gold >> RedPotionsInBag >> BluePotionsInBag >> PurplePotionsInBag
+                   >> RedPotionCost >> BluePotionCost >> PurplePotionCost >> Arena1Beat
+                   >> Arena2Beat >> Arena3Beat >> Arena4Beat >> Arena5Beat;
 
             inFile.close();
             std::cout << "Player data loaded successfully.\n";
@@ -329,30 +318,6 @@ void LoadFromFile(const std::string& fileName) {
             std::cout << "You don't have a save file. Starting a new game!\n";
         }
     }
-
-
-
-
-
-
-//Function to display Player and Monster Stats:
-void DisplayStats(int MonsterNumber){
-    ClearScreenWithoutInput();
-    if (ThePlayer.GetCurrentHP() <= 5){
-        ChangeColor(12);
-
-    }else {
-        ChangeColor(9);
-    }
-    cout << "Player Stats: (HP: " << ThePlayer.GetCurrentHP() << "/" <<ThePlayer.GetMaxHP() 
-         << ") (EXP: " << ThePlayer.GetCurrentEXP() << ") (Needed EXP: " << ThePlayer.GetEXPToNextLevel() 
-         << ") (Gold: " << ThePlayer.GetGold() << ")" << endl;
-    cout << Line << endl;
-    // Displaying monster health information
-    cout << ArrayOfMonsters[MonsterNumber].GetName() <<" Stats: (Current HP: "
-         << ArrayOfMonsters[MonsterNumber].GetCurrentHP() << ")"<< endl;
-    cout << Line << endl;
-}
 
 // The main arena system.
 void Arena() {
@@ -458,7 +423,7 @@ bool PlayerTurn(int MonsterNumber) {
     UserInput=  toLowerCase(UserInput);
     Validated = Validate(UserInput, "a", "p", "g");
     if (!Validated) {cout << "Invalid entry! Please try again!" << endl; goto PlayerBattleChoice;}
-    if (UserInput == "a") {
+    if (UserInput == "a") {                                                                                                 // Chose to attack.
         int MissChance = 0;
         MissChance = Distribution(Generator);
         if (MissChance != 20) {
@@ -491,9 +456,7 @@ bool PlayerTurn(int MonsterNumber) {
             Sleep(200);
             return true;
         }
-    } else if (UserInput == "p") {
-        //Creating User Input variable
-        string ChosenPotion = "";
+    } else if (UserInput == "p") {                                                                          // Chose to use a potion.
         //Displaying current number of potions
         PotionInventory:
         ClearScreenWithoutInput();
@@ -530,8 +493,7 @@ bool PlayerTurn(int MonsterNumber) {
             goto PlayerBattleChoice;
         }
         return true;
-    } 
-    else {
+    } else {                                                                                                // Chose to run away.
         cout << "You have given up the fight!";
         Sleep(2000);
         HasRunAway = true;
@@ -560,6 +522,20 @@ void FillArrayOfMonsterObjects() {
         ArrayOfMonsters[i].SetGold(Text);
         File >> Text;
         ArrayOfMonsters[i].SetMethodOfAttack(Text);
+    }
+    File.close();
+}
+
+// Fills an array with the text displaying a monster sprite.
+void FillArrayOfMonsterSprites() {
+    ifstream File("MonsterSprites.txt");
+    string Text = "";
+    for (int i = 0; i < AMOUNT_OF_MONSTERS; i++) {
+        for (int j = 0; j < 6; j++) {
+            getline(File, Text);
+            ArrayOfMonsterSprites[i][j] = Text;
+
+        }
     }
     File.close();
 }
@@ -601,7 +577,7 @@ void Scroll(string Text) {
     cout << endl;
 }
 
-// The first frame of the title screen.
+// The first animated frame of the title screen.
 void SwordAnimation1() {
     ClearScreenWithoutInput();
     ChangeColor(13);
@@ -631,7 +607,7 @@ void SwordAnimation1() {
     cout << Line << endl;
 }
 
-// The second frame of the title screen.
+// The second animated frame of the title screen.
 void SwordAnimation2() {
     ClearScreenWithoutInput();
     ChangeColor(13);
@@ -698,7 +674,7 @@ void MainMenu() {
 
 }
 
-
+// Displays the starting menu screen.
 void SaveScreen (){
     ClearScreenWithoutInput();
     std::cout << "\t\t\t*************************************\n";
@@ -712,10 +688,6 @@ void SaveScreen (){
     std::cout << "\t\t\t*************************************\n";
     std::cout << Line << endl;
 }
-
-
-
-
 
 // Accepts a string to print and a color to print it in.
 void CH (string Chunk, int Color) {
@@ -828,6 +800,42 @@ void ArenaMenuPage2() {
     cout << Line << endl;
     ChangeColor(11);
     cout << "Please enter the Gauntlet that would you like to challenge: " << endl;
+}
+
+//Function to display Player and Monster Stats:
+void DisplayStats(int MonNum){
+    ClearScreenWithoutInput();
+    ChangeColor(11);
+    cout << "    o *                                                                   * o " << endl; 
+    CH("    .               ", 11);CH(ArrayOfMonsterSprites[MonNum][0], 12);CH("                                  /\\            . ", 15);cout << endl;
+    CH("                    ", 11);CH(ArrayOfMonsterSprites[MonNum][1], 12);CH("                                 /* \\             ", 15);cout << endl;
+    CH("                    ", 9);CH(ArrayOfMonsterSprites[MonNum][2], 12);CH("                              __/    \\__          ", 15);cout << endl;
+    CH("                    ", 9);CH(ArrayOfMonsterSprites[MonNum][3], 12);CH("                             /__________\\         ", 15);cout << endl;
+    CH("                    ", 9);CH(ArrayOfMonsterSprites[MonNum][4], 12);CH("                      /\\      (|\\_____/|)         ", 15);cout << endl;
+    CH("                    ", 1);CH(ArrayOfMonsterSprites[MonNum][5], 12);CH("                      \\ \\      \\______/           ", 15);cout << endl;
+    ChangeColor(11);
+    cout << "                 --==========--                    \\ \\     / *YYY* \\          " << endl; 
+    ChangeColor(9);
+    cout << "                                                    \\ \\   / *       \\         " << endl; 
+    ChangeColor(1);
+    cout << "          ++..'.          ...         ...  .'.oOo.   \\ \\ / |=======| |        " << endl; 
+    ChangeColor(13);
+    cout << "   -  - --__--________________---___________________________________--=-_-- - " << endl; 
+    if (ThePlayer.GetCurrentHP() <= 5){
+        ChangeColor(12);
+
+    }else {
+        ChangeColor(9);
+    }
+    cout << Line << endl;
+    cout << "Player Stats: (HP: " << ThePlayer.GetCurrentHP() << "/" <<ThePlayer.GetMaxHP() 
+         << ") (EXP: " << ThePlayer.GetCurrentEXP() << ") (Needed EXP: " << ThePlayer.GetEXPToNextLevel() 
+         << ") (Gold: " << ThePlayer.GetGold() << ")" << endl;
+    cout << Line << endl;
+    // Displaying monster health information
+    cout << ArrayOfMonsters[MonNum].GetName() <<" Stats: (Current HP: "
+         << ArrayOfMonsters[MonNum].GetCurrentHP() << ")"<< endl;
+    cout << Line << endl;
 }
 
 // Validates input compared to different characters. Overloaded.
