@@ -21,6 +21,7 @@
 #include <random>
 #include <windows.h>
 #include <fstream>
+#include <cctype>
 
 // Used for the ClearScreen() function.
 
@@ -77,8 +78,8 @@ void Arena();                                                   // The main batt
 bool MonsterTurn(int);                                          // Computes the monster's damage to the player.
 bool PlayerTurn(int);                                           // Computes the players damage to the monster.
 
-void DisplayStats(); //testing
-
+void DisplayStats();                                            // Displays Player and Monster stats.
+std::string toLowerCase(const std::string &str);                // Changes user input to lower case.
 void FillArrayOfMonsterObjects();                               // Creates an array of Monster objects.
 void ClearScreen();                                             // Clears text from the screen. Waits for input to do so.
 void ClearScreenWithoutInput();                                 // Clears text from the screen. Activates when called.
@@ -113,6 +114,7 @@ int main() {
     MainMenu();
     MainMenuInput:                                                                                                  // The main menu option box.
     cin >> UserInput;
+    UserInput=  toLowerCase(UserInput);
     Validated = Validate(UserInput, "g", "p");
     // Repeats the question if input is incorrect.
     if (!Validated) {std::cout << "Invalid entry! Please try again!" << endl; goto MainMenuInput;} 
@@ -122,6 +124,7 @@ int main() {
         PotionScreen();
         PotionMenuInput:
         cin >> UserInput;
+        UserInput=  toLowerCase(UserInput);
         Validated = Validate(UserInput, "r", "b", "p", "n");
         if (!Validated) {std::cout << "Invalid entry! Please try again!" << endl; goto PotionMenuInput;}
         if (UserInput == "r") {                                                                                     // Chose to buy Red Potion.
@@ -150,6 +153,7 @@ int main() {
         ArenaMenuPage1();
         ArenaInputPg1:                                                                                              // Arena menu page 1.
         cin >> UserInput;
+        UserInput=  toLowerCase(UserInput);
         Validated = Validate(UserInput, "a", "b", "c", "p", "n");
         if (!Validated) {std::cout << "Invalid entry! Please try again!" << endl; goto ArenaInputPg1;} 
         if (UserInput == "a") {                                                                                     // Chose Arena 1.
@@ -174,6 +178,7 @@ int main() {
             ArenaMenuPage2();
             ArenaInputPg2:                                                                                          // Arena menu page 2.
             cin >> UserInput;
+            UserInput=  toLowerCase(UserInput);
             Validated = Validate(UserInput, "d", "e", "f", "p", "n");
             if (!Validated) {cout << "Invalid entry! Please try again!" << endl; goto ArenaInputPg2;}
             if (UserInput == "d") {                                                                                 // Chose Arena 4.
@@ -211,7 +216,22 @@ int main() {
 // ---------------------------------------------------------------------- Function Definitions:
 
 
+//Function to convert a string to lowercase
+std::string toLowerCase(const std::string& str) {
+    std::string result = str;
+    for (char& c : result) {
+        c = std::tolower(c);
+    }
+    return result;
+}
 
+
+
+
+
+
+
+//Function to display Player and Monster Stats:
 void DisplayStats(int MonsterNumber){
     ClearScreenWithoutInput();
     if (ThePlayer.GetCurrentHP() <= 5){
@@ -327,6 +347,7 @@ bool PlayerTurn(int MonsterNumber) {
     ChangeColor(11);
     cout << "Enter an action: ('a' = ATTACK, 'p' = POTION, 'g' = GIVE UP)" << endl;
     cin >> UserInput;
+    UserInput=  toLowerCase(UserInput);
     Validated = Validate(UserInput, "a", "p", "g");
     if (!Validated) {cout << "Invalid entry! Please try again!" << endl; goto PlayerBattleChoice;}
     if (UserInput == "a") {
@@ -383,6 +404,7 @@ bool PlayerTurn(int MonsterNumber) {
         PotionInventoryInput:
         std::cout << "Enter the potion you want to use ('r', 'b', 'p') or 'n' to go back: " << endl;
         cin >> UserInput;
+        UserInput=  toLowerCase(UserInput);
         Validated = Validate(UserInput, "r", "b", "p", "n");
         if (!Validated) {cout << "Invalid entry! Please try again!" << endl; goto PotionInventoryInput;}
         
@@ -623,6 +645,7 @@ void BattlePotionMenu(string PotionColor, int PotionHealAmount, int MonsterNumbe
         std::cout << "You don't have any " << PotionColor << " Potions to use! " <<endl;
         Sleep(1000);
         DisplayStats(MonsterNumber);
+        PlayerTurn(MonsterNumber);
     }
 }
 
