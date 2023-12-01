@@ -41,7 +41,7 @@ std::mt19937 Generator(Rand());
 std::uniform_int_distribution<int> Distribution(1, 20);
 std::uniform_int_distribution<int> DamageDistribution(0, 3);
 
-int const AMOUNT_OF_MONSTERS = 18;                                                                       // The amount of monsters in the game.
+int const AMOUNT_OF_MONSTERS = 40;                                                                       // The amount of monsters in the game.
 string QUIT = "99";                                                                                      // Used to quit the game when asked.
 string UserInput = "";                                                                                   // Used to decide what action to take in the menus.
 string Line = "--------------------------------------------------------------------------------";        // Used to separate output.
