@@ -30,10 +30,10 @@ VenomousVine 28 10 8 15 12 10 entangles
 BlazingSalamander 42 20 16 12 25 18 wrestles
 MysticSphinx 48 22 24 20 28 25 riddles
 GolemKing 75 30 30 15 40 35 smashes
-DarkHarpy 32 14 12 18 16 14 screeches
+DarkHarpy 32 14 12 18 16 14 dices
 CursedKnight 65 28 26 22 30 32 slashes
 LavaElemental 50 24 20 18 22 20 torches
-IceWraith 40 18 15 20 20 18 freezes
+IceWraith 40 18 15 20 20 18 liquifies
 ToxicSlime 20 8 6 15 10 5 dissolves
 ElectricJellyfish 22 10 8 20 15 10 shocks
 ShiftingShadow 30 15 12 18 22 18 surrounds
