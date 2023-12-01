@@ -80,6 +80,9 @@ bool PlayerTurn(int);                                           // Computes the 
 
 void DisplayStats();                                            // Displays Player and Monster stats.
 std::string toLowerCase(const std::string &str);                // Changes user input to lower case.
+void SaveToFile(const std::string& fileName);                   // Saves the player stats
+void LoadFromFile(const std::string& fileName);
+void SaveScreen();                                              // Save Screen
 void FillArrayOfMonsterObjects();                               // Creates an array of Monster objects.
 void ClearScreen();                                             // Clears text from the screen. Waits for input to do so.
 void ClearScreenWithoutInput();                                 // Clears text from the screen. Activates when called.
@@ -107,15 +110,31 @@ int main() {
     HasRunAway = false;
     Introduction();
     std::cout << "Press Enter to begin..." << endl;
+    std::cin.get();
+    SaveScreen:
+    SaveScreen();
+    cin >> UserInput;
+    UserInput = toLowerCase(UserInput);
+    Validated = Validate(UserInput, "c", "s");
+    if (!Validated) {std::cout << "Invalid entry! Please try again!" << endl; goto SaveScreen;}
+    if (UserInput == "c"){
+        LoadFromFile("player_data.txt");
+        Sleep(1200);
+        ClearScreenWithoutInput();
+    }else {
+        ClearScreenWithoutInput();
+    }
     MainMenu: 
-    ThePlayer.SetCurrentHP(ThePlayer.GetMaxHP());
     ClearScreen();
+    ThePlayer.SetCurrentHP(ThePlayer.GetMaxHP());
+
+
     ChangeColor(11);
     MainMenu();
     MainMenuInput:                                                                                                  // The main menu option box.
     cin >> UserInput;
     UserInput=  toLowerCase(UserInput);
-    Validated = Validate(UserInput, "g", "p");
+    Validated = Validate(UserInput, "g", "p", "s");
     // Repeats the question if input is incorrect.
     if (!Validated) {std::cout << "Invalid entry! Please try again!" << endl; goto MainMenuInput;} 
     if (UserInput == "p") {                                                                                         //Chose to buy potions.
@@ -148,7 +167,7 @@ int main() {
         } else {                                                                                                    // Chose to leave potion shop.
             goto MainMenu;
         }
-    } else {                                                                                                        // Chose to enter an arena.
+    } else if (UserInput == "g"){                                                                                                        // Chose to enter an arena.
         ArenaMenu:                                                                                              
         ArenaMenuPage1();
         ArenaInputPg1:                                                                                              // Arena menu page 1.
@@ -206,6 +225,11 @@ int main() {
             else if (UserInput == "p") {goto ArenaMenu;}
             else {goto MainMenu;}
         } else {goto MainMenu;}
+    } else {
+        SaveToFile("player_data.txt");
+        Sleep(800);
+
+        goto MainMenu;
     }
     
     std::cout << "Press Enter to exit...";
@@ -225,6 +249,86 @@ std::string toLowerCase(const std::string& str) {
     return result;
 }
 
+void SaveToFile(const std::string& fileName) {
+        std::ofstream outFile(fileName, std::ios::out);
+
+        if (outFile.is_open()) {
+            outFile << ThePlayer.GetLevel() << ' '
+                    << ThePlayer.GetMaxHP() << ' '
+                    << ThePlayer.GetATK() << ' '
+                    << ThePlayer.GetDEF() << ' '
+                    << ThePlayer.GetAG() << ' '
+                    << ThePlayer.GetCurrentEXP() << ' '
+                    << ThePlayer.GetEXPToNextLevel() << ' '
+                    << ThePlayer.GetGold() << ' '
+                    << RedPotionsInBag << ' '
+                    << BluePotionsInBag << ' '
+                    << PurplePotionsInBag << ' '
+                    << RedPotionCost << ' '
+                    << BluePotionCost << ' '
+                    << PurplePotionCost << ' '
+                    << Arena1Beat << ' '
+                    << Arena2Beat << ' '
+                    << Arena3Beat << ' '
+                    << Arena4Beat << ' '
+                    << Arena5Beat;
+
+            outFile.close();
+            std::cout << "Player data saved successfully.\n";
+        }
+}
+
+
+void LoadFromFile(const std::string& fileName) {
+        std::ifstream inFile(fileName, std::ios::in);
+        int level;
+        int maxHP;
+        int ATK;
+        int DEF;
+        int AG;
+        int currentEXP;
+        int expToNextLevel;
+        int gold;
+        
+
+        if (inFile.is_open()) {
+            inFile >> level
+                   >> maxHP
+                   >> ATK
+                   >> DEF
+                   >> AG
+                   >> currentEXP
+                   >> expToNextLevel
+                   >> gold
+                   >> RedPotionsInBag
+                   >> BluePotionsInBag
+                   >> PurplePotionsInBag
+                   >> RedPotionCost
+                   >> BluePotionCost
+                   >> PurplePotionCost
+                   >> Arena1Beat
+                   >> Arena2Beat
+                   >> Arena3Beat
+                   >> Arena4Beat
+                   >> Arena5Beat;
+
+            inFile.close();
+            std::cout << "Player data loaded successfully.\n";
+
+            // Set player stats using setter functions
+            ThePlayer.SetLevel(level);
+            ThePlayer.SetMaxHP(maxHP);
+            ThePlayer.SetATK(ATK);
+            ThePlayer.SetDEF(DEF);
+            ThePlayer.SetAG(AG);
+            ThePlayer.SetCurrentEXP(currentEXP);
+            ThePlayer.SetEXPToNextLevel(expToNextLevel);
+            ThePlayer.SetGold(gold);
+
+        } else {
+            std::cout << "You don't have a save file. Starting a new game!\n";
+        }
+    }
 
 
 
@@ -285,6 +389,9 @@ void Arena() {
                 PlayerIsAlive = MonsterTurn(i);
                 if (PlayerIsAlive) {
                     MonsterIsAlive = PlayerTurn(i);
+                    if (HasRunAway) {
+                        break;
+                    }
                 } 
             }
             Sleep(600);
@@ -343,6 +450,7 @@ bool MonsterTurn(int MonsterNumber) {
 
 // The player's turn in which they can choose to attack, use a potion, or give up. Also checks for victory.
 bool PlayerTurn(int MonsterNumber) {
+    HasRunAway = false;
     PlayerBattleChoice:
     ChangeColor(11);
     cout << "Enter an action: ('a' = ATTACK, 'p' = POTION, 'g' = GIVE UP)" << endl;
@@ -585,10 +693,29 @@ void MainMenu() {
     cout << "        ---====/                                        \\=======--------        " << endl;
     ChangeColor(9);
     std::cout << Line << endl;
-    std::cout << "Enter whether you want to start a Gauntlet ('g'), or buy potions ('p'): " << endl;
+    std::cout << "Enter whether you want to start a Gauntlet ('g'), buy potions ('p'), or save ('s'): " << endl;
     std::cout << Line << endl;
 
 }
+
+
+void SaveScreen (){
+    ClearScreenWithoutInput();
+    std::cout << "\t\t\t*************************************\n";
+    std::cout << "\t\t\t*             GAME MENU             *\n";
+    std::cout << "\t\t\t*************************************\n";
+    std::cout << "\t\t\t*                                   *\n";
+    std::cout << "\t\t\t*  S. Start New Game                *\n";
+    std::cout << "\t\t\t*  C. Continue                      *\n";
+    std::cout << "\t\t\t*  E. Exit                          *\n";
+    std::cout << "\t\t\t*                                   *\n";
+    std::cout << "\t\t\t*************************************\n";
+    std::cout << Line << endl;
+}
+
+
+
+
 
 // Accepts a string to print and a color to print it in.
 void CH (string Chunk, int Color) {
