@@ -2,16 +2,8 @@
 // Run in the Command Prompt in the folder containing the "Monster.h", "Monster.cpp", and "TurnBasedBattleSystem.cpp" files.
 
 /* Still to be added:
-    In-battle potion use ✓
-    In-battle running ✓
-    Miss chance for player and monsters ✓
-    Variable damage ✓
-    Menu graphic ✓
-    Battle graphic
-    Eighteen monster data entries ✓
+    Monster images
     Balancing difficulty
-    Save Player values and relevant in-game variables to a text file. ✓
-    Load Player values and relevant in-game variables from a text file.
     
 */
 
@@ -22,9 +14,8 @@
 #include <windows.h>
 #include <fstream>
 #include <cctype>
-#include <cstdlib>
 
-// Used for the ClearScreen() function.
+// Used for the ClearScreen() function. Sets what command is used.
 
 #ifdef _WIN32
 const std::string OS = "Windows";
@@ -38,14 +29,18 @@ const std::string OS = "Unknown";
 
 using namespace std;
 
+// Random number generators used for damage and hit chance:
+
 std::random_device Rand;
 std::mt19937 Generator(Rand());
 std::uniform_int_distribution<int> Distribution(1, 20);
 std::uniform_int_distribution<int> DamageDistribution(0, 3);
 
-int const AMOUNT_OF_MONSTERS = 36;                                                                       // The amount of monsters in the game.
+//------------------------------------------------------------------------ Variable definitions:
+
+int const AMOUNT_OF_MONSTERS = 37;                                                                       // The amount of monsters in the game.
 string QUIT = "99";                                                                                      // Used to quit the game when asked.
-string UserInput = "";                                                                                   // Used to decide what action to take in the menus.
+string UserInput = "";                                                                                   // Holds what action the player entered.
 string Line = "--------------------------------------------------------------------------------";        // Used to separate output.
 Monster ArrayOfMonsters[AMOUNT_OF_MONSTERS];                                                             // An array of Monster objects.
 string ArrayOfMonsterSprites[AMOUNT_OF_MONSTERS][8];                                                     // An array holding the battle sprite of each monster.
@@ -73,39 +68,45 @@ bool Arena2Beat = false;                                                        
 bool Arena3Beat = false;                                                                                 // -
 bool Arena4Beat = false;                                                                                 // -
 bool Arena5Beat = false;                                                                                 // -
+bool Arena6Beat = false;                                                                                 // -
 
 // ---------------------------------------------------------------------- Function Prototypes:
 
-void Arena();                                                   // The main battle scene.
-bool MonsterTurn(int);                                          // Computes the monster's damage to the player.
-bool PlayerTurn(int);                                           // Computes the players damage to the monster.
+void Arena();                                                           // The main battle scene.
+bool MonsterTurn(int);                                                  // Computes the monster's damage to the player.
+bool PlayerTurn(int);                                                   // Computes the players damage to the monster.
+bool FinalBattle();                                                     // The final boss battle.
+void DisplayFinalBattle(int);                                           // Displays the final boss fight graphic.
 
-void DisplayStats(int);                                         // Displays Player and Monster stats.
-std::string toLowerCase(const std::string &str);                // Changes user input to lower case.
-void SaveToFile(const std::string& fileName);                   // Saves the player stats
-void LoadFromFile(const std::string& fileName);
-void SaveScreen();                                              // Save Screen
-void exit();                                                    //Exit from the cmd
-void FillArrayOfMonsterObjects();                               // Creates an array of Monster objects.
-void FillArrayOfMonsterSprites();                               // Fills the ArrayOfMonsterSprites with data from the MonsterSprites.txt file.
-void ClearScreen();                                             // Clears text from the screen. Waits for input to do so.
-void ClearScreenWithoutInput();                                 // Clears text from the screen. Activates when called.
-void ChangeColor(int);                                          // Changes the text color.
-void Scroll(string);                                            // Prints text one character at a time.
-void SwordAnimation1();                                         // Title animation.
-void SwordAnimation2();                                         // Title animation.
-void Introduction();                                            // Text introducing the game.
-void MainMenu();                                                // The main menu image and text.
-void CH(string, int);                                           // Prints the entered chunk of text in the entered color.
-void PotionScreen();                                            // Displays the potion shop.
-void BattlePotionMenu(string, int, int);                        // Displays the in-battle potion menu.
-void ArenaMenuPage1();                                          // Displays Arena options menu 1.
-void ArenaMenuPage2();                                          // Displays Arena options menu 2.
+void DisplayStats(int);                                                 // Displays Player and Monster stats.
+std::string toLowerCase(const std::string &str);                        // Changes user input to lower case.
+void SaveToFile(const std::string& fileName);                           // Saves the player stats
+void LoadFromFile(const std::string& fileName);                         // Loads the player's stats from the save.txt file.
+void OpeningMenuScreen();                                               // Displays the Save Screen
 
-bool Validate(string, string, string, string, string, string);  // Validate input against five options.
-bool Validate(string, string, string, string, string);          // Validate input against four options.
-bool Validate(string, string, string, string);                  // Validate input against three options.
-bool Validate(string, string, string);                          // Validate input against two options.
+void FillArrayOfMonsterObjects();                                       // Creates an array of Monster objects.
+void FillArrayOfMonsterSprites();                                       // Fills the ArrayOfMonsterSprites with data from the MonsterSprites.txt file.
+void ClearScreen();                                                     // Clears text from the screen. Waits for input to do so.
+void ClearScreenWithoutInput();                                         // Clears text from the screen. Activates when called.
+void ChangeColor(int);                                                  // Changes the text color.
+
+void Scroll(string);                                                    // Prints text one character at a time.
+void SwordAnimation1();                                                 // Title animation.
+void SwordAnimation2();                                                 // Title animation.
+void Introduction();                                                    // Text introducing the game.
+void MainMenu();                                                        // The main menu image and text.
+
+void CH(string, int);                                                   // Prints the entered chunk of text in the entered color.
+void PotionScreen();                                                    // Displays the potion shop.
+void BattlePotionMenu(string, int, int);                                // Displays the in-battle potion menu.
+void ArenaMenuPage1();                                                  // Displays Arena options menu 1.
+void ArenaMenuPage2();                                                  // Displays Arena options menu 2.
+
+bool Validate(string, string, string, string, string, string, string);  // Validate input against six options.
+bool Validate(string, string, string, string, string, string);          // Validate input against five options.
+bool Validate(string, string, string, string, string);                  // Validate input against four options.
+bool Validate(string, string, string, string);                          // Validate input against three options.
+bool Validate(string, string, string);                                  // Validate input against two options.
 
 // ---------------------------------------------------------------------- Main Program:
 
@@ -117,19 +118,17 @@ int main() {
     std::cout << "Press Enter to begin..." << endl;
     std::cin.get();
     SaveScreen:
-    SaveScreen();
+    OpeningMenuScreen();
     cin >> UserInput;
     UserInput = toLowerCase(UserInput);
-    Validated = Validate(UserInput, "c", "s", "e");
+    Validated = Validate(UserInput, "c", "s");
     if (!Validated) {std::cout << "Invalid entry! Please try again!" << endl; goto SaveScreen;}
     if (UserInput == "c"){
-        LoadFromFile("player_data.txt");
+        LoadFromFile("save.txt");
         Sleep(1200);
         ClearScreenWithoutInput();
-    }else if (UserInput == "s"){
-        ClearScreenWithoutInput();
     }else {
-        exit();
+        ClearScreenWithoutInput();
     }
     MainMenu: 
     ClearScreen();
@@ -174,7 +173,7 @@ int main() {
         } else {                                                                                                    // Chose to leave potion shop.
             goto MainMenu;
         }
-    } else if (UserInput == "g"){                                                                                                        // Chose to enter an arena.
+    } else if (UserInput == "g"){                                                                                   // Chose to enter an arena.
         ArenaMenu:                                                                                              
         ArenaMenuPage1();
         ArenaInputPg1:                                                                                              // Arena menu page 1.
@@ -182,17 +181,17 @@ int main() {
         UserInput=  toLowerCase(UserInput);
         Validated = Validate(UserInput, "a", "b", "c", "p", "n");
         if (!Validated) {std::cout << "Invalid entry! Please try again!" << endl; goto ArenaInputPg1;} 
-        if (UserInput == "a") {                                                                                     // Chose Arena 1.
+        if (UserInput == "a") {                                                                                     // Chose Wooden Arena.
             CurrentArena = 1;
             Arena();
-        } else if (UserInput == "b") {                                                                              // Chose Arena 2.
+        } else if (UserInput == "b") {                                                                              // Chose Tin Arena.
             if (Arena1Beat == true) {
                 CurrentArena = 2;
                 Arena();
             } else {
                 std::cout << "That Gauntlet is locked! Beat the previous Gauntlet to unlock it." << endl; goto ArenaInputPg1;
             }
-        } else if (UserInput == "c") {                                                                              // Chose Arena 3.
+        } else if (UserInput == "c") {                                                                              // Chose Bronze Arena.
             if (Arena2Beat == true) {
                 CurrentArena = 3;
                 Arena();
@@ -205,56 +204,57 @@ int main() {
             ArenaInputPg2:                                                                                          // Arena menu page 2.
             cin >> UserInput;
             UserInput=  toLowerCase(UserInput);
-            Validated = Validate(UserInput, "d", "e", "f", "p", "n");
+            Validated = Validate(UserInput, "d", "e", "f", "g", "p", "n");
             if (!Validated) {cout << "Invalid entry! Please try again!" << endl; goto ArenaInputPg2;}
-            if (UserInput == "d") {                                                                                 // Chose Arena 4.
+            if (UserInput == "d") {                                                                                 // Chose Silver Arena.
                 if (Arena3Beat == true) {
                     CurrentArena = 4;
                     Arena();
+                    goto MainMenu;
                 } else {
                     std::cout << "That Gauntlet is locked! Beat the previous Gauntlet to unlock it." << endl; goto ArenaInputPg2;
                 }
-            } else if (UserInput == "e") {                                                                          // Chose Arena 5.
+            } else if (UserInput == "e") {                                                                          // Chose Gold Arena.
                 if (Arena4Beat == true) {
                     CurrentArena = 5;
                     Arena();
+                    goto MainMenu;
                 } else {
                     std::cout << "That Gauntlet is locked! Beat the previous Gauntlet to unlock it." << endl; goto ArenaInputPg2;
                 }
-            } else if (UserInput == "f") {                                                                          // Chose Arena 6.
+            } else if (UserInput == "f") {                                                                          // Chose Platinum Arena.
                 if (Arena5Beat == true) {
                     CurrentArena = 6;
                     Arena();
+                    goto MainMenu;
                 } else {
                     std::cout << "That Gauntlet is locked! Beat the previous Gauntlet to unlock it." << endl; goto ArenaInputPg2;
                 }
-            }
-            else if (UserInput == "p") {goto ArenaMenu;}
-            else {goto MainMenu;}
+            } else if (UserInput == "g") {                                                                          // Chose Final Boss.
+                if (Arena6Beat == true) {
+                    CurrentArena = 7;
+                    FinalBattle();
+                    goto MainMenu;
+                } else {
+                    std::cout << "Invalid entry! Please try again." << endl; goto ArenaInputPg2;
+                }
+            } else if (UserInput == "p") {goto ArenaMenu;
+            } else {goto MainMenu;}
         } else {goto MainMenu;}
     } else {
-        SaveToFile("player_data.txt");
+        SaveToFile("save.txt");
         Sleep(800);
 
         goto MainMenu;
     }
     
+    // Exit text. Should never be seen in-game.
     std::cout << "Press Enter to exit...";
     std::cin.get();  // Wait for the user to press Enter
     return 0;
 }
 
 // ---------------------------------------------------------------------- Function Definitions:
-
-//Function to exit from the cmd
-void exit(){
-    std::exit(0);
-}
-
-
-
-
-
 
 
 // Function to convert a string to lowercase
@@ -289,7 +289,8 @@ void SaveToFile(const std::string& fileName) {
                     << Arena2Beat << ' '
                     << Arena3Beat << ' '
                     << Arena4Beat << ' '
-                    << Arena5Beat;
+                    << Arena5Beat << ' '
+                    << Arena6Beat;
 
             outFile.close();
             std::cout << "Player data saved successfully.\n";
@@ -307,13 +308,12 @@ void LoadFromFile(const std::string& fileName) {
         int currentEXP;
         int expToNextLevel;
         int gold;
-        
 
         if (inFile.is_open()) {
             inFile >> level >> maxHP >> ATK >> DEF >> AG >> currentEXP >> expToNextLevel
                    >> gold >> RedPotionsInBag >> BluePotionsInBag >> PurplePotionsInBag
                    >> RedPotionCost >> BluePotionCost >> PurplePotionCost >> Arena1Beat
-                   >> Arena2Beat >> Arena3Beat >> Arena4Beat >> Arena5Beat;
+                   >> Arena2Beat >> Arena3Beat >> Arena4Beat >> Arena5Beat >> Arena6Beat;
 
             inFile.close();
             std::cout << "Player data loaded successfully.\n";
@@ -335,12 +335,11 @@ void LoadFromFile(const std::string& fileName) {
 
 // The main arena system.
 void Arena() {
-    bool PlayerIsAlive = true; 
-    bool PlayerIsDead = false; 
-    bool MonsterIsAlive = true;
-    int CurrentMonster = (CurrentArena - 1) * 6;
-    int CurrentRound = 1;
-    for (int i = CurrentMonster; i < CurrentMonster + 6; i++) {
+    bool PlayerIsAlive = true;                                                                  // Holds whether to leave the arena because of player defeat.                                                              // 
+    bool MonsterIsAlive = true;                                                                 // Holds whether to move to the next monster because of victory.
+    int CurrentMonster = (CurrentArena - 1) * 6;                                                // What monster is being fought.
+    int CurrentRound = 1;                                                                       // Used to print the roound number at the beginning of each fight.
+    for (int i = CurrentMonster; i < CurrentMonster + 6; i++) {  // Six monsters for each arena.
         ClearScreenWithoutInput();
         ChangeColor(10);
         cout << "Round " << CurrentRound << ": " << ArrayOfMonsters[i].GetName() << endl;
@@ -385,10 +384,16 @@ void Arena() {
     if (PlayerIsAlive && HasRunAway == false) {
         cout << Line << endl;
         cout << "You beat the Gauntlet!" << endl;
+        if (CurrentArena == 6) {
+            cout << "- The LegacyBeast awaits..." << endl;
+        }
         switch (CurrentArena) {
             case 1: Arena1Beat = true; break;
             case 2: Arena2Beat = true; break;
             case 3: Arena3Beat = true; break;
+            case 4: Arena4Beat = true; break;
+            case 5: Arena5Beat = true; break;
+            case 6: Arena6Beat = true; break;
         }
         cout << Line << endl;
         Sleep(3000);
@@ -397,7 +402,7 @@ void Arena() {
 
 // The monster's attack. Computes damage with MonsterATK - PlayerDEF. Also checks for game over.
 bool MonsterTurn(int MonsterNumber) {
-    int MissChance = 0;
+    int MissChance = 0;                     // Chance for player to miss. Filled with a random number each attack.
     MissChance = Distribution(Generator);
     if (MissChance != 20) {
         int DamageDealt;
@@ -543,11 +548,11 @@ void FillArrayOfMonsterObjects() {
 // Fills an array with the text displaying a monster sprite.
 void FillArrayOfMonsterSprites() {
     ifstream File("MonsterSprites.txt");
-    string Text = "";
+    string InText = "";
     for (int i = 0; i < AMOUNT_OF_MONSTERS; i++) {
         for (int j = 0; j < 6; j++) {
-            getline(File, Text);
-            ArrayOfMonsterSprites[i][j] = Text;
+            getline(File, InText);
+            ArrayOfMonsterSprites[i][j] = InText;
 
         }
     }
@@ -617,7 +622,7 @@ void SwordAnimation1() {
     cout << "Gauntlets fighting strange and terrifying monsters. As you battle, you'll" << endl;
     cout << "gain gold that can be used to purchase potions, and experience points that" << endl;
     cout << "can help you level up and gain better stats, such as Health, Attack, and" << endl;
-    cout << "Defence. You'll have to beat all [NUMBER] gauntlets to become the Champion." << endl;
+    cout << "Defence. You'll have to beat all six gauntlets to become the Champion." << endl;
     cout << Line << endl;
 }
 
@@ -647,7 +652,7 @@ void SwordAnimation2() {
     cout << "Gauntlets fighting strange and terrifying monsters. As you battle, you'll" << endl;
     cout << "gain gold that can be used to purchase potions, and experience points that" << endl;
     cout << "can help you level up and gain better stats, such as Health, Attack, and" << endl;
-    cout << "Defence. You'll have to beat all [NUMBER] gauntlets to become the Champion." << endl;
+    cout << "Defence. You'll have to beat all six gauntlets to become the Champion." << endl;
     cout << Line << endl;
     ChangeColor(11);
 }
@@ -689,7 +694,7 @@ void MainMenu() {
 }
 
 // Displays the starting menu screen.
-void SaveScreen (){
+void OpeningMenuScreen (){
     ClearScreenWithoutInput();
     std::cout << "\t\t\t*************************************\n";
     std::cout << "\t\t\t*             GAME MENU             *\n";
@@ -809,6 +814,7 @@ void ArenaMenuPage2() {
     if (Arena3Beat == true) {cout << "'d' = Silver Arena" << endl;} else {cout << "'d' = [Locked]" << endl;}
     if (Arena4Beat == true) {cout << "'e' = Gold Arena" << endl;} else {cout << "'e' = [Locked]" << endl;}
     if (Arena5Beat == true) {cout << "'f' = Platinum Arena" << endl;} else {cout << "'f' = [Locked]" << endl;}
+    if (Arena6Beat == true) {cout << "'g' = LegacyBeast" << endl;}
     cout << "'p' = Page <-" << endl;
     cout << "'n' = Nevermind..." << endl;
     cout << Line << endl;
@@ -852,7 +858,110 @@ void DisplayStats(int MonNum){
     cout << Line << endl;
 }
 
+bool FinalBattle() {
+    bool PlayerIsAlive = true; 
+    bool MonsterIsAlive = true;
+    ClearScreenWithoutInput();
+    ChangeColor(10);
+    std::cout << "Final round: " << ArrayOfMonsters[36].GetName() << endl;
+    Sleep(3000);
+    ArrayOfMonsters[36].SetCurrentHP(ArrayOfMonsters[36].GetMaxHP());
+
+        while (PlayerIsAlive && MonsterIsAlive) {
+            ClearScreenWithoutInput();
+            if (ThePlayer.GetCurrentHP() <= 5) {
+                ChangeColor(12);
+            } else {
+                ChangeColor(9);
+            }
+            DisplayFinalBattle(12);
+            Sleep(100);
+            if (ArrayOfMonsters[36].GetAG() < ThePlayer.GetAG()) {
+                MonsterIsAlive = PlayerTurn(36);
+                if (HasRunAway) {
+                    break;
+                }
+                if (MonsterIsAlive) {
+                    PlayerIsAlive = MonsterTurn(36);
+                } 
+            } else {
+                PlayerIsAlive = MonsterTurn(36);
+                if (PlayerIsAlive) {
+                    MonsterIsAlive = PlayerTurn(36);
+                    if (HasRunAway) {
+                        break;
+                    }
+                } 
+            }
+            Sleep(600);
+        }
+        MonsterIsAlive = true;
+        if (PlayerIsAlive == false || HasRunAway == true) {
+            return false;
+        }
+    if (PlayerIsAlive && HasRunAway == false) {
+        float TimeBetweenColorFlashes = 1.0;        // Decreases the time between the final boss's defeated color flashes.
+        for (int j = 0; j < 8; j++) {
+            for (int i = 1; i < 16; i++) {
+                DisplayFinalBattle(i);
+                Sleep(600 * (TimeBetweenColorFlashes));
+                TimeBetweenColorFlashes -= .04;
+                if (TimeBetweenColorFlashes <= 0) {
+                    TimeBetweenColorFlashes = 0.04;
+                }
+            } 
+        }
+        DisplayFinalBattle(0);
+        Sleep(500);
+        cout << Line << endl;
+        cout << "You defeated the " << ArrayOfMonsters[36].GetName() << "!" << endl;
+        cout << Line << endl;
+        Sleep(3000);
+        return true;
+    }
+    return false;
+}
+
+void DisplayFinalBattle(int Color) {
+    ClearScreenWithoutInput();
+    ChangeColor(11);
+    cout << " O *                                                                          " << endl;
+    CH("                    /\\                   ", Color);CH("                               * o   ", 11);cout << endl;
+    CH("              _-/\\=/* \\=/\\-_             ", Color);CH("                                 .   ", 11);cout << endl;
+    CH("            _/      /\\      \\_           ", Color);CH("                                     ", 15);cout << endl;
+    CH("           /  *   _ /\\ _      \\          ", Color);CH("                     /\\              ", 15);cout << endl;
+    CH("          |*     //    \\\\      |         ", Color);CH("                    /  \\             ", 15);cout << endl;
+    CH("          |  \\_ | \\____/ | _/  |         ", Color);CH("                 __/    \\__          ", 15);cout << endl;
+    CH("         /  |   \\ /*   \\ /   |  \\        ", Color);CH("                /__________\\         ", 15);cout << endl;
+    CH("    _ _='  _\\    \\______/    /  _'=_ _   ", Color);CH("         /\\      (|\\_____/|)         ", 15);cout << endl;
+    CH("   / / / }_/-'=- \\ X  X / -='-\\_{ \\ \\ \\  ", Color);CH("         \\ \\      \\______/           ", 15);cout << endl;
+    CH("   \\|\\|\\|         \\ '' /         |/|/|/  ", Color);CH("          \\ \\     / \\/\\/\\/\\          ", 11);cout << endl;
+    CH("                   |\\/|                  ", Color);CH("           \\ \\   /         \\         ", 9);cout << endl;
+    ChangeColor(1);
+    cout << "++..'.                      ...  .'.oOo.   A         \\ \\ / |=======| |      " << endl;
+    ChangeColor(13);
+    cout << "   -  - --__--A_______________---_________/ \\_A____A________________--=-_-- - " << endl;
+    if (ThePlayer.GetCurrentHP() <= 5){
+        ChangeColor(12);
+    }else {
+        ChangeColor(9);
+    }
+    cout << Line << endl;
+    cout << "Player Stats: (HP: " << ThePlayer.GetCurrentHP() << "/" <<ThePlayer.GetMaxHP()
+         << ") (EXP: " << ThePlayer.GetCurrentEXP() << ") (Needed EXP: " << ThePlayer.GetEXPToNextLevel()
+         << ") (Gold: " << ThePlayer.GetGold() << ")" << endl;
+    std::cout << Line << endl;
+    // Displaying monster health information
+    std::cout << ArrayOfMonsters[36].GetName() <<" Stats: (Current HP: "
+         << ArrayOfMonsters[36].GetCurrentHP() << ")"<< endl;
+    std::cout << Line << endl;
+}
+
 // Validates input compared to different characters. Overloaded.
+bool Validate(string Input, string Option1, string Option2, string Option3, string Option4, string Option5, string Option6) {
+    return (Input == Option1 || Input == Option2 || Input == Option3 || Input == Option4 || Input == Option5 || Input == Option6);
+}
+
 bool Validate(string Input, string Option1, string Option2, string Option3, string Option4, string Option5) {
     return (Input == Option1 || Input == Option2 || Input == Option3 || Input == Option4 || Input == Option5);
 }
