@@ -118,7 +118,7 @@ void Player::SetEXPToNextLevel(int EnteredEXP) {
 }
 
 void Player::RaiseEXPToNextLevel() {
-        EXPToNextLevel *= 1.2; // Raises required EXP every level.
+        EXPToNextLevel *= 1.4; // Raises required EXP every level.
 }
 
 void Player::SetGold(int EnteredGold) {
