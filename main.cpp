@@ -22,6 +22,7 @@
 #include <windows.h>
 #include <fstream>
 #include <cctype>
+#include <cstdlib>
 
 // Used for the ClearScreen() function.
 
@@ -84,6 +85,7 @@ std::string toLowerCase(const std::string &str);                // Changes user 
 void SaveToFile(const std::string& fileName);                   // Saves the player stats
 void LoadFromFile(const std::string& fileName);
 void SaveScreen();                                              // Save Screen
+void exit();                                                    //Exit from the cmd
 void FillArrayOfMonsterObjects();                               // Creates an array of Monster objects.
 void FillArrayOfMonsterSprites();                               // Fills the ArrayOfMonsterSprites with data from the MonsterSprites.txt file.
 void ClearScreen();                                             // Clears text from the screen. Waits for input to do so.
@@ -118,14 +120,16 @@ int main() {
     SaveScreen();
     cin >> UserInput;
     UserInput = toLowerCase(UserInput);
-    Validated = Validate(UserInput, "c", "s");
+    Validated = Validate(UserInput, "c", "s", "e");
     if (!Validated) {std::cout << "Invalid entry! Please try again!" << endl; goto SaveScreen;}
     if (UserInput == "c"){
         LoadFromFile("player_data.txt");
         Sleep(1200);
         ClearScreenWithoutInput();
-    }else {
+    }else if (UserInput == "s"){
         ClearScreenWithoutInput();
+    }else {
+        exit();
     }
     MainMenu: 
     ClearScreen();
@@ -241,6 +245,16 @@ int main() {
 }
 
 // ---------------------------------------------------------------------- Function Definitions:
+
+//Function to exit from the cmd
+void exit(){
+    std::exit(0);
+}
+
+
+
+
+
 
 
 // Function to convert a string to lowercase
