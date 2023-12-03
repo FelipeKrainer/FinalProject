@@ -14,6 +14,7 @@
 #include <windows.h>
 #include <fstream>
 #include <cctype>
+#include <cstdlib>
 
 // Used for the ClearScreen() function. Sets what command is used.
 
@@ -83,6 +84,7 @@ std::string toLowerCase(const std::string &str);                        // Chang
 void SaveToFile(const std::string& fileName);                           // Saves the player stats
 void LoadFromFile(const std::string& fileName);                         // Loads the player's stats from the save.txt file.
 void OpeningMenuScreen();                                               // Displays the Save Screen
+void StatsScreen();                                                     // Displays the Stats Screen
 
 void FillArrayOfMonsterObjects();                                       // Creates an array of Monster objects.
 void FillArrayOfMonsterSprites();                                       // Fills the ArrayOfMonsterSprites with data from the MonsterSprites.txt file.
@@ -121,7 +123,7 @@ int main() {
     OpeningMenuScreen();
     cin >> UserInput;
     UserInput = toLowerCase(UserInput);
-    Validated = Validate(UserInput, "c", "s");
+    Validated = Validate(UserInput, "c", "s", "e");
     if (!Validated) {std::cout << "Invalid entry! Please try again!" << endl; goto SaveScreen;}
     if (UserInput == "c"){
         LoadFromFile("save.txt");
@@ -140,7 +142,7 @@ int main() {
     MainMenuInput:                                                                                                  // The main menu option box.
     cin >> UserInput;
     UserInput=  toLowerCase(UserInput);
-    Validated = Validate(UserInput, "g", "p", "s");
+    Validated = Validate(UserInput, "g", "p", "s", "a");
     // Repeats the question if input is incorrect.
     if (!Validated) {std::cout << "Invalid entry! Please try again!" << endl; goto MainMenuInput;} 
     if (UserInput == "p") {                                                                                         //Chose to buy potions.
@@ -241,10 +243,13 @@ int main() {
             } else if (UserInput == "p") {goto ArenaMenu;
             } else {goto MainMenu;}
         } else {goto MainMenu;}
-    } else {
+    } else if(UserInput == "s"){
         SaveToFile("save.txt");
         Sleep(800);
 
+        goto MainMenu;
+    }else if(UserInput == "a"){
+        StatsScreen();
         goto MainMenu;
     }
     
@@ -332,6 +337,43 @@ void LoadFromFile(const std::string& fileName) {
             std::cout << "You don't have a save file. Starting a new game!\n";
         }
     }
+
+
+//Stats screen
+
+void StatsScreen(){
+    Stats:
+    ClearScreenWithoutInput();
+    CH("             __             ",6);cout << "\n";
+    CH("            '=_\\_           ",6);CH("  ****************************************\n",3);
+    CH("  [\\          /*  \\          ",6);CH("             Player Stats               \n",3);
+    CH("  \\ \\        [ -+- ]         ",6);CH(" ****************************************\n",3);
+    CH("   \\ \\     _-|__|__|-_       ",6);CH(" Max Health:       ",3);cout << ThePlayer.GetMaxHP() << endl;
+    CH("    \\ \\   / /*  V   \\ \\      ",6);CH(" Attack:           ",3);cout << ThePlayer.GetATK() << endl;
+    CH("     \\ \\__'_\\ -___- / _____  ",6);CH(" Agility:          ",3);cout << ThePlayer.GetAG() << endl;
+    CH("      \\/ //  [     ] [* |  ] ",6);CH(" Defense:          ",3);cout << ThePlayer.GetDEF() << endl;
+    CH("      |/()   |=====| | -+- | ",6);CH(" ****************************************\n",3);
+    CH("             [/ _ \\]  \\_|_/  ",6);CH(" Level:            ",3);cout << ThePlayer.GetLevel() << endl;
+    CH("             |__|__|         ",6);CH(" Experience:       ",3);cout << ThePlayer.GetCurrentEXP() << endl;
+    CH("            _|  |  |_        ",6);CH(" Gold:             ",3);cout << ThePlayer.GetGold() << endl;
+    CH("       - --|*  \\|/   |-- -   ",6);CH(" ****************************************\n",3);
+    cout << "Press 'b' to go back to the main menu. " << endl;
+    
+        cin >> UserInput;
+    UserInput = toLowerCase(UserInput);
+    if (UserInput == "b"){
+        cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        ClearScreenWithoutInput();
+        MainMenu();
+    }else {
+        cout << "Invalid entry! Please try again.";
+        Sleep(800);
+        
+    }
+       
+}
+
+
 
 // The main arena system.
 void Arena() {
@@ -688,7 +730,7 @@ void MainMenu() {
     cout << "        ---====/                                        \\=======--------        " << endl;
     ChangeColor(9);
     std::cout << Line << endl;
-    std::cout << "Enter whether you want to start a Gauntlet ('g'), buy potions ('p'), or save ('s'): " << endl;
+    std::cout << "Enter whether you want to start a Gauntlet ('g'), buy potions ('p'), check stats ('a'), or save ('s'): " << endl;
     std::cout << Line << endl;
 
 }
