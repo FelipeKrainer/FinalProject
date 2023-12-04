@@ -128,20 +128,14 @@ int main() {
     if (UserInput == "c"){
         LoadFromFile("save.txt");
         Sleep(1200);
-        ClearScreenWithoutInput();
-    }else {
-        ClearScreenWithoutInput();
     }
     MainMenu: 
-    ClearScreen();
     ThePlayer.SetCurrentHP(ThePlayer.GetMaxHP());
-
-
     ChangeColor(11);
     MainMenu();
     MainMenuInput:                                                                                                  // The main menu option box.
     cin >> UserInput;
-    UserInput=  toLowerCase(UserInput);
+    UserInput =  toLowerCase(UserInput);
     Validated = Validate(UserInput, "g", "p", "s", "a");
     // Repeats the question if input is incorrect.
     if (!Validated) {std::cout << "Invalid entry! Please try again!" << endl; goto MainMenuInput;} 
@@ -339,10 +333,8 @@ void LoadFromFile(const std::string& fileName) {
     }
 
 
-//Stats screen
-
+// Displays the player's stats screen.
 void StatsScreen(){
-    Stats:
     ClearScreenWithoutInput();
     CH("             __             ",6);cout << "\n";
     CH("            '=_\\_           ",6);CH("  ****************************************\n",3);
@@ -357,23 +349,19 @@ void StatsScreen(){
     CH("             |__|__|         ",6);CH(" Experience:       ",3);cout << ThePlayer.GetCurrentEXP() << endl;
     CH("            _|  |  |_        ",6);CH(" Gold:             ",3);cout << ThePlayer.GetGold() << endl;
     CH("       - --|*  \\|/   |-- -   ",6);CH(" ****************************************\n",3);
-    cout << "Press 'b' to go back to the main menu. " << endl;
-    
-        cin >> UserInput;
+    cout << Line << endl;
+    cout << "Press ('b') to go back to the main menu. " << endl;
+    cout << Line << endl;
+    Stats:
+    cin >> UserInput;
     UserInput = toLowerCase(UserInput);
     if (UserInput == "b"){
-        cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        ClearScreenWithoutInput();
         MainMenu();
     }else {
-        cout << "Invalid entry! Please try again.";
-        Sleep(800);
-        
+        cout << "Invalid entry! Please try again." << endl;
+        goto Stats;
     }
-       
 }
-
-
 
 // The main arena system.
 void Arena() {
@@ -715,6 +703,7 @@ void MainMenu() {
     // ...Yes, it's probably not done with coding 'best practices'...
     // ...Yes, I might lose points for this function... 
     // But I still like how it outputs to the screen.
+    ClearScreenWithoutInput();
     ChangeColor(9);
     cout << "        .                                         .                .            " << endl;
     CH("                    .          .  ",11);CH("  /  ",12);CH("                         .               ",11);cout << endl;
@@ -730,8 +719,10 @@ void MainMenu() {
     cout << "        ---====/                                        \\=======--------        " << endl;
     ChangeColor(9);
     std::cout << Line << endl;
-    std::cout << "Enter whether you want to start a Gauntlet ('g'), buy potions ('p'), check stats ('a'), or save ('s'): " << endl;
+    std::cout << "'g' = Enter a Gauntlet, 'p' = Buy potions, 'd' = Data screen, 's' = Save." << endl;
     std::cout << Line << endl;
+    ChangeColor(11);
+    std::cout << "Please enter what you want to do: " << endl;
 
 }
 
