@@ -701,12 +701,8 @@ void OpeningTextScroll() {
     while(kbhit()) getch(); // Clear any keyboard inputs entered while the text was scrolling.
 }
 
-// Prints the main menu screen. Each CH() call is changing the color of the text inside it (CH defined below).
+// Prints the main menu screen. Each CH() call is changing the color of the text inside it to the entered number (CH defined below).
 void MainMenu() {
-    // ...Yes, it's gross looking...
-    // ...Yes, it's probably not done with coding 'best practices'...
-    // ...Yes, I might lose points for this function... 
-    // But I still like how it outputs to the screen.
     ClearScreenWithoutInput();
     ChangeColor(9);
     cout << endl;
@@ -731,7 +727,7 @@ void MainMenu() {
 
 }
 
-// Displays the player's stats screen.
+// Displays the player's stats screen. Each CH() call is changing the color of the text inside it to the entered number (CH defined below).
 void StatsScreen(){
     ClearScreenWithoutInput();
     CH("|                A                |",12);CH("*********************************************",9);cout << endl;
@@ -763,7 +759,7 @@ void StatsScreen(){
     }
 }
 
-// Accepts a string to print and a color to print it in.
+// Accepts a string to print and a color to print it in and displays the entered string in that color. CH is short for Chunk.
 void CH (string Chunk, int Color) {
     ChangeColor(Color);
     cout << Chunk;
@@ -878,7 +874,7 @@ void ArenaMenuPage2() {
     cout << "Please enter the Gauntlet that would you like to challenge: " << endl;
 }
 
-//Function to display Player and Monster Stats:
+//Function to display Player and Monster Stats: Each CH() call is changing the color of the text inside it to the entered number (CH defined above).
 void DisplayStats(int MonNum){
     ClearScreenWithoutInput();
     ChangeColor(11);
@@ -916,14 +912,17 @@ void DisplayStats(int MonNum){
 
 // The final battle loop. Exits upon victory, defeat, or giving up.
 bool FinalBattle() {
-    bool PlayerIsAlive = true; 
-    bool MonsterIsAlive = true;
+    bool PlayerIsAlive = true; // Holds whether to leave the fight loop because of defeat.
+    bool MonsterIsAlive = true; // Holds whether to leave the fight loop because of victory.
+
+    // Clears the screen and displays the current round. Sets up the current monster's HP.
     ClearScreenWithoutInput();
     ChangeColor(10);
     std::cout << "Final round: " << ArrayOfMonsters[36].GetName() << endl;
     Sleep(3000);
     ArrayOfMonsters[36].SetCurrentHP(ArrayOfMonsters[36].GetMaxHP());
 
+        // The battle loops while the player is alive. This section displays the player and monster data and the battle graphic.
         while (PlayerIsAlive && MonsterIsAlive) {
             ClearScreenWithoutInput();
             if (ThePlayer.GetCurrentHP() <= 5) {
@@ -933,6 +932,8 @@ bool FinalBattle() {
             }
             DisplayFinalBattle(12);
             Sleep(100);
+
+            // Alternates between calling the PlayerTurn and MonsterTurn functions until one returns false (denoting either victory or defeat).
             if (ArrayOfMonsters[36].GetAG() < ThePlayer.GetAG()) {
                 MonsterIsAlive = PlayerTurn(36);
                 if (HasRunAway) {
@@ -952,12 +953,16 @@ bool FinalBattle() {
             }
             Sleep(600);
         }
+
+        // Checks if the player lost or gave up and returns false if so.
         MonsterIsAlive = true;
         if (PlayerIsAlive == false || HasRunAway == true) {
             return false;
         }
+
+    // This section displays the final boss's defeat animation in which it flashes different colors at an increasing rate.
     if (PlayerIsAlive && HasRunAway == false) {
-        float TimeBetweenColorFlashes = 1.0;        // Decreases the time between the final boss's defeated color flashes.
+        float TimeBetweenColorFlashes = 1.0; // Decreases the time between the final boss's defeated color flashes.
         for (int j = 0; j < 8; j++) {
             for (int i = 1; i < 16; i++) {
                 DisplayFinalBattle(i);
@@ -968,6 +973,8 @@ bool FinalBattle() {
                 }
             } 
         }
+
+        // Displays the battle screen with the boss hidden and prints the victory text.
         DisplayFinalBattle(0);
         Sleep(500);
         cout << Line << endl;
@@ -979,6 +986,7 @@ bool FinalBattle() {
     return false;
 }
 
+// Displays the final boss fight and stats. 
 void DisplayFinalBattle(int Color) {
     ClearScreenWithoutInput();
     ChangeColor(11);
