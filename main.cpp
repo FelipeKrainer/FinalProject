@@ -4,7 +4,6 @@
 /* Still to be added:
     Monster images
     Balancing difficulty
-    
 */
 
 #include "Monster.h"
@@ -15,8 +14,9 @@
 #include <fstream>
 #include <cctype>
 #include <cstdlib>
+#include <conio.h>
 
-// Used for the ClearScreen() function. Sets what command is used.
+// Used for the ClearScreenWithoutInput() function. Sets what command is used.
 
 #ifdef _WIN32
 const std::string OS = "Windows";
@@ -28,13 +28,14 @@ const std::string OS = "Linux";
 const std::string OS = "Unknown";
 #endif
 
+
 using namespace std;
 
 // Random number generators used for damage and hit chance:
 
 std::random_device Rand;
 std::mt19937 Generator(Rand());
-std::uniform_int_distribution<int> Distribution(1, 20);
+std::uniform_int_distribution<int> HitChanceDistribution(1, 20);
 std::uniform_int_distribution<int> DamageDistribution(0, 3);
 
 //------------------------------------------------------------------------ Variable definitions:
@@ -84,11 +85,11 @@ std::string toLowerCase(const std::string &str);                        // Chang
 void SaveToFile(const std::string& fileName);                           // Saves the player stats
 void LoadFromFile(const std::string& fileName);                         // Loads the player's stats from the save.txt file.
 void OpeningMenuScreen();                                               // Displays the Save Screen
+void OpeningTextScroll();                                               // Displays story text at the beginning.
 void StatsScreen();                                                     // Displays the Stats Screen
 
 void FillArrayOfMonsterObjects();                                       // Creates an array of Monster objects.
 void FillArrayOfMonsterSprites();                                       // Fills the ArrayOfMonsterSprites with data from the MonsterSprites.txt file.
-void ClearScreen();                                                     // Clears text from the screen. Waits for input to do so.
 void ClearScreenWithoutInput();                                         // Clears text from the screen. Activates when called.
 void ChangeColor(int);                                                  // Changes the text color.
 
@@ -128,6 +129,8 @@ int main() {
     if (UserInput == "c"){
         LoadFromFile("save.txt");
         Sleep(1200);
+    } else {
+        OpeningTextScroll();
     }
     MainMenu: 
     ThePlayer.SetCurrentHP(ThePlayer.GetMaxHP());
@@ -136,12 +139,11 @@ int main() {
     MainMenuInput:                                                                                                  // The main menu option box.
     cin >> UserInput;
     UserInput =  toLowerCase(UserInput);
-    Validated = Validate(UserInput, "g", "p", "s", "a");
+    Validated = Validate(UserInput, "g", "p", "s", "d");
     // Repeats the question if input is incorrect.
     if (!Validated) {std::cout << "Invalid entry! Please try again!" << endl; goto MainMenuInput;} 
     if (UserInput == "p") {                                                                                         //Chose to buy potions.
         PotionMenu:           
-        ClearScreen();
         PotionScreen();
         PotionMenuInput:
         cin >> UserInput;
@@ -242,7 +244,7 @@ int main() {
         Sleep(800);
 
         goto MainMenu;
-    }else if(UserInput == "a"){
+    }else if(UserInput == "d"){
         StatsScreen();
         goto MainMenu;
     }
@@ -329,39 +331,10 @@ void LoadFromFile(const std::string& fileName) {
 
         } else {
             std::cout << "You don't have a save file. Starting a new game!\n";
+            Sleep(1000);
+            OpeningTextScroll();
         }
     }
-
-
-// Displays the player's stats screen.
-void StatsScreen(){
-    ClearScreenWithoutInput();
-    CH("             __             ",6);cout << "\n";
-    CH("            '=_\\_           ",6);CH("  ****************************************\n",3);
-    CH("  [\\          /*  \\          ",6);CH("             Player Stats               \n",3);
-    CH("  \\ \\        [ -+- ]         ",6);CH(" ****************************************\n",3);
-    CH("   \\ \\     _-|__|__|-_       ",6);CH(" Max Health:       ",3);cout << ThePlayer.GetMaxHP() << endl;
-    CH("    \\ \\   / /*  V   \\ \\      ",6);CH(" Attack:           ",3);cout << ThePlayer.GetATK() << endl;
-    CH("     \\ \\__'_\\ -___- / _____  ",6);CH(" Agility:          ",3);cout << ThePlayer.GetAG() << endl;
-    CH("      \\/ //  [     ] [* |  ] ",6);CH(" Defense:          ",3);cout << ThePlayer.GetDEF() << endl;
-    CH("      |/()   |=====| | -+- | ",6);CH(" ****************************************\n",3);
-    CH("             [/ _ \\]  \\_|_/  ",6);CH(" Level:            ",3);cout << ThePlayer.GetLevel() << endl;
-    CH("             |__|__|         ",6);CH(" Experience:       ",3);cout << ThePlayer.GetCurrentEXP() << endl;
-    CH("            _|  |  |_        ",6);CH(" Gold:             ",3);cout << ThePlayer.GetGold() << endl;
-    CH("       - --|*  \\|/   |-- -   ",6);CH(" ****************************************\n",3);
-    cout << Line << endl;
-    cout << "Press ('b') to go back to the main menu. " << endl;
-    cout << Line << endl;
-    Stats:
-    cin >> UserInput;
-    UserInput = toLowerCase(UserInput);
-    if (UserInput == "b"){
-        MainMenu();
-    }else {
-        cout << "Invalid entry! Please try again." << endl;
-        goto Stats;
-    }
-}
 
 // The main arena system.
 void Arena() {
@@ -433,7 +406,7 @@ void Arena() {
 // The monster's attack. Computes damage with MonsterATK - PlayerDEF. Also checks for game over.
 bool MonsterTurn(int MonsterNumber) {
     int MissChance = 0;                     // Chance for player to miss. Filled with a random number each attack.
-    MissChance = Distribution(Generator);
+    MissChance = HitChanceDistribution(Generator);
     if (MissChance != 20) {
         int DamageDealt;
         DamageDealt = (ArrayOfMonsters[MonsterNumber].GetATK() - ThePlayer.GetDEF()) + DamageDistribution(Generator);
@@ -474,7 +447,7 @@ bool PlayerTurn(int MonsterNumber) {
     if (!Validated) {cout << "Invalid entry! Please try again!" << endl; goto PlayerBattleChoice;}
     if (UserInput == "a") {                                                                                                 // Chose to attack.
         int MissChance = 0;
-        MissChance = Distribution(Generator);
+        MissChance = HitChanceDistribution(Generator);
         if (MissChance != 20) {
 
             int DamageDealt;
@@ -589,16 +562,6 @@ void FillArrayOfMonsterSprites() {
     File.close();
 }
 
-// Clears the screen using different commands depending on the system the program is run on. Requires player to press enter.
-void ClearScreen() {
-    cin.get();
-    if (OS == "Windows") {
-        system("cls");  // Clear the screen
-    } else if (OS == "Mac OS" || OS == "Linux") {
-        system("clear");
-    }
-}
-
 // Clears the screen using different commands depending on the system the program is run on. No input is needed.
 void ClearScreenWithoutInput() {
     if (OS == "Windows") {
@@ -620,10 +583,14 @@ void ChangeColor(int Color) {
 // Prints text one character at a time.
 void Scroll(string Text) {
     for (int i = 0; i < Text.length(); i++) {
-        cout << Text[i];
-        Sleep(1);
+        if (Text[i] == '|') {
+            Sleep(300);
+        } else {
+            cout << Text[i];
+            Sleep(20);
+        }
+        
     }
-    cout << endl;
 }
 
 // The first animated frame of the title screen.
@@ -697,6 +664,43 @@ void Introduction() {
     }
 }
 
+// Displays the starting menu screen.
+void OpeningMenuScreen (){
+    ClearScreenWithoutInput();
+    std::cout << "\t\t\t*************************************\n";
+    std::cout << "\t\t\t*             GAME MENU             *\n";
+    std::cout << "\t\t\t*************************************\n";
+    std::cout << "\t\t\t*                                   *\n";
+    std::cout << "\t\t\t*  S. Start New Game                *\n";
+    std::cout << "\t\t\t*  C. Continue                      *\n";
+    std::cout << "\t\t\t*  E. Exit                          *\n";
+    std::cout << "\t\t\t*                                   *\n";
+    std::cout << "\t\t\t*************************************\n";
+    std::cout << Line << endl;
+}
+
+// Displays intro text one character at a time. Any '|'s in the text denote a pause.
+void OpeningTextScroll() {
+    ClearScreenWithoutInput();
+    Sleep(1000);
+    Scroll("Once upon a time, |a warrior left his wife and child in hopes of overcoming the Monster Arena,|"); cout << endl;
+    Scroll("a challenging sequence of battles run by a twisted King."); cout << endl << endl;
+    Sleep(1000);
+    Scroll("He fought marvelously, |swiftly beating every monster until he reached the final fight against"); cout << endl;
+    Scroll("the king's prized monster. ||After many hours, |he slew the creature with a mighty blow."); cout << endl << endl;
+    Sleep(1000);
+    Scroll("The king, |seized by a fit of anger, |cast a magic blast at the warrior that turned him into a"); cout << endl;
+    Scroll("mindless beast. ||The king set this beast as his new champion."); cout << endl << endl;
+    Sleep(1000);
+    Scroll("When the King died, |the monsters remained but the Monster Arena fell into ruin. ||No-one ever"); cout << endl;
+    Scroll("went back into that arena to free the warrior."); cout << endl << endl;
+    Sleep(1000);
+    Scroll("No-one, |that is, |until his son arrived."); cout << endl;
+    Sleep(2000);
+    ClearScreenWithoutInput();
+    while(kbhit()) getch(); // Clear any keyboard inputs entered while the text was scrolling.
+}
+
 // Prints the main menu screen. Each CH() call is changing the color of the text inside it (CH defined below).
 void MainMenu() {
     // ...Yes, it's gross looking...
@@ -705,6 +709,7 @@ void MainMenu() {
     // But I still like how it outputs to the screen.
     ClearScreenWithoutInput();
     ChangeColor(9);
+    cout << endl;
     cout << "        .                                         .                .            " << endl;
     CH("                    .          .  ",11);CH("  /  ",12);CH("                         .               ",11);cout << endl;
     CH("           '    ,         .     ", 15);CH("   /", 12);CH("        '   .      +   .         .          ", 15);cout << endl;
@@ -726,19 +731,36 @@ void MainMenu() {
 
 }
 
-// Displays the starting menu screen.
-void OpeningMenuScreen (){
+// Displays the player's stats screen.
+void StatsScreen(){
     ClearScreenWithoutInput();
-    std::cout << "\t\t\t*************************************\n";
-    std::cout << "\t\t\t*             GAME MENU             *\n";
-    std::cout << "\t\t\t*************************************\n";
-    std::cout << "\t\t\t*                                   *\n";
-    std::cout << "\t\t\t*  S. Start New Game                *\n";
-    std::cout << "\t\t\t*  C. Continue                      *\n";
-    std::cout << "\t\t\t*  E. Exit                          *\n";
-    std::cout << "\t\t\t*                                   *\n";
-    std::cout << "\t\t\t*************************************\n";
-    std::cout << Line << endl;
+    CH("|                A                |",12);CH("*********************************************",9);cout << endl;
+    CH("|           ____/ \\____           |",12);CH("                Player Stats            ",9);cout << endl;
+    CH("|  [\\       \\__ ___ __/           |",12);CH("*********************************************",9);cout << endl;
+    CH("|  \\ \\        ( *   )             |",12);CH("            Level:            ",6);cout << ThePlayer.GetLevel() << endl;
+    CH("|   \\ \\      _.'=-='._            |",12);CH("            Max Health:       ",6);cout << ThePlayer.GetMaxHP() << endl;
+    CH("|    \\ \\    /* /YYY\\  \\           |",12);CH("            Attack:           ",6);cout << ThePlayer.GetATK() << endl;
+    CH("|     \\ \\__'_/\\-___-/\\ \\__        |",12);CH("            Defense:          ",6);cout << ThePlayer.GetDEF() << endl;
+    CH("|      \\/ /// ]=====[ [* |  ]     |",12);CH("            Agility:          ",6);cout << ThePlayer.GetAG() << endl;
+    CH("|      |/()   / ___ \\ \\ -+- /     |",12);CH("*********************************************\n",9);
+    CH("|            /_/ _ \\_\\ \\_|_/      |",12);CH("            Experience:       ",6);cout << ThePlayer.GetCurrentEXP() << endl;
+    CH("|             |__|__|             |",12);CH("            Gold:             ",6);cout << ThePlayer.GetGold() << endl;
+    CH("|            _|_ | _|_            |",12);CH("            Defeats: ",6);cout << endl;
+    CH("|_      - --|*  \\|/   |-- -      _|",12);CH("*********************************************",9);cout << endl;
+    cout << Line << endl;
+    cout << "Enter 'n' to go back to main menu. " << endl;
+    cout << Line << endl;
+    ChangeColor(11);
+    cout << "Please enter what you want to do: " << endl;
+    Stats:
+    cin >> UserInput;
+    UserInput = toLowerCase(UserInput);
+    if (UserInput == "n"){
+        MainMenu();
+    }else {
+        cout << "Invalid entry! Please try again." << endl;
+        goto Stats;
+    }
 }
 
 // Accepts a string to print and a color to print it in.
@@ -749,6 +771,7 @@ void CH (string Chunk, int Color) {
 
 // Prints text showing the potion shop menu.
 void PotionScreen() {
+    ClearScreenWithoutInput();
     ChangeColor(14);
     cout << "                                                                                " << endl;
     cout << "     ___                               ___                              ___     " << endl;
@@ -802,7 +825,7 @@ void BattlePotionMenu(string PotionColor, int PotionHealAmount, int MonsterNumbe
 
 // Prints text showing the first arena menu.
 void ArenaMenuPage1() {
-    ClearScreen();
+    ClearScreenWithoutInput();
     ChangeColor(8);
     cout << "        _______________________________________________________________     " << endl;
     cout << "        _______________________________________________________________     " << endl;
@@ -829,7 +852,7 @@ void ArenaMenuPage1() {
 
 // Prints text showing the second arena menu.
 void ArenaMenuPage2() {
-    ClearScreen();
+    ClearScreenWithoutInput();
     ChangeColor(8);
     cout << "        _______________________________________________________________     " << endl;
     cout << "        _______________________________________________________________     " << endl;
@@ -891,6 +914,7 @@ void DisplayStats(int MonNum){
     cout << Line << endl;
 }
 
+// The final battle loop. Exits upon victory, defeat, or giving up.
 bool FinalBattle() {
     bool PlayerIsAlive = true; 
     bool MonsterIsAlive = true;
