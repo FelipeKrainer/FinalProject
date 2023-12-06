@@ -102,7 +102,7 @@ void MainMenu();                                                        // The m
 
 void CH(string, int);                                                   // Prints the entered chunk of text in the entered color.
 void PotionScreen();                                                    // Displays the potion shop.
-void BattlePotionMenu(string, int, int);                                // Displays the in-battle potion menu.
+bool BattlePotionMenu(string, int, int);                                // Displays the in-battle potion menu.
 void ArenaMenuPage1();                                                  // Displays Arena options menu 1.
 void ArenaMenuPage2();                                                  // Displays Arena options menu 2.
 
@@ -252,10 +252,7 @@ int main() {
         goto MainMenu;
     }
     
-    // Exit text. Should never be seen in-game.
-    std::cout << "Press Enter to exit...";
-    std::cin.get();  // Wait for the user to press Enter
-    Exit:
+    Exit: // Jumped to from the continue/new game option menu.
     return 0;
 }
 
@@ -498,8 +495,8 @@ bool PlayerTurn(int MonsterNumber) {
         std::cout << "You have " << PurplePotionsInBag << " Purple Potion(s)." << endl;
         ChangeColor(11);
         std::cout << Line << endl;
-        PotionInventoryInput:
         std::cout << "Enter the potion you want to use ('r', 'b', 'p') or 'n' to go back: " << endl;
+        PotionInventoryInput:
         cin >> UserInput;
         UserInput=  toLowerCase(UserInput);
         Validated = Validate(UserInput, "r", "b", "p", "n");
@@ -507,13 +504,19 @@ bool PlayerTurn(int MonsterNumber) {
         
         //Creating logic of the Red Potion
         if (UserInput == "r"){
-            BattlePotionMenu("Red", RedPotionHeal, MonsterNumber);
+            if(!BattlePotionMenu("Red", RedPotionHeal, MonsterNumber)) {
+                goto PotionInventoryInput;
+            }
         //Creating the logic of the Blue Potion
         } else if (UserInput == "b"){
-            BattlePotionMenu("Blue", BluePotionHeal, MonsterNumber);
+            if(!BattlePotionMenu("Blue", BluePotionHeal, MonsterNumber)) {
+                goto PotionInventoryInput;
+            }
         //Creating the logic of the Purple Potion
         } else if (UserInput == "p"){
-            BattlePotionMenu("Purple", PurplePotionHeal, MonsterNumber);
+            if(!BattlePotionMenu("Purple", PurplePotionHeal, MonsterNumber)) {
+                goto PotionInventoryInput;
+            }
         } else {
             DisplayStats(MonsterNumber);
             goto PlayerBattleChoice;
@@ -823,13 +826,16 @@ void PotionScreen() {
     cout << "Enter the type of potion you want:" << endl;
 }
 
-void BattlePotionMenu(string PotionColor, int PotionHealAmount, int MonsterNumber) {
+// The in-battle potion inventory.
+bool BattlePotionMenu(string PotionColor, int PotionHealAmount, int MonsterNumber) {
     int PotionsInBag;
     if (PotionColor == "Red") {PotionsInBag = RedPotionsInBag;} 
     else if (PotionColor == "Blue") {PotionsInBag = BluePotionsInBag;}
     else{PotionsInBag = PurplePotionsInBag;};
     if (PotionsInBag >= 1){
-        ChangeColor(4);
+        if (PotionColor == "Red") {ChangeColor(4);}
+        if (PotionColor == "Blue") {ChangeColor(9);}
+        if (PotionColor == "Purple") {ChangeColor(13);}
         std::cout << "You used a " << PotionColor << " Potion!" << endl;
         ThePlayer.SetCurrentHP(ThePlayer.GetCurrentHP() + PotionHealAmount);
         //Checking if player current health won't go over max health. If it will, set current health to max health.
@@ -844,11 +850,10 @@ void BattlePotionMenu(string PotionColor, int PotionHealAmount, int MonsterNumbe
                 
         Sleep(1000);
         DisplayStats(MonsterNumber);
+        return true;
     } else {
         std::cout << "You don't have any " << PotionColor << " Potions to use! " <<endl;
-        Sleep(1000);
-        DisplayStats(MonsterNumber);
-        PlayerTurn(MonsterNumber);
+        return false;
     }
 }
 
