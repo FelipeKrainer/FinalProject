@@ -130,8 +130,10 @@ int main() {
     if (UserInput == "c"){
         LoadFromFile("save.txt");
         Sleep(1200);
-    } else {
+    } else if (UserInput == "s"){
         OpeningTextScroll();
+    } else {
+        goto Exit; // Jumps to the end of the main function.
     }
     MainMenu: 
     ThePlayer.SetCurrentHP(ThePlayer.GetMaxHP());
@@ -253,6 +255,7 @@ int main() {
     // Exit text. Should never be seen in-game.
     std::cout << "Press Enter to exit...";
     std::cin.get();  // Wait for the user to press Enter
+    Exit:
     return 0;
 }
 
@@ -377,7 +380,7 @@ void Arena() {
                 } 
             }
             Sleep(600);
-            
+            while(kbhit()) getch(); // Clear any keyboard inputs entered while the battle was looping.
         }
         MonsterIsAlive = true;
         CurrentRound += 1;
