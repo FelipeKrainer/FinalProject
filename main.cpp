@@ -97,6 +97,7 @@ void Scroll(string);                                                    // Print
 void SwordAnimation1();                                                 // Title animation.
 void SwordAnimation2();                                                 // Title animation.
 void Introduction();                                                    // Text introducing the game.
+void DisplayOpeningTextGraphic();                                       // Shows the opening text-scroll image.
 void MainMenu();                                                        // The main menu image and text.
 
 void CH(string, int);                                                   // Prints the entered chunk of text in the entered color.
@@ -679,25 +680,54 @@ void OpeningMenuScreen (){
     std::cout << Line << endl;
 }
 
+// Displays the opening text-scroll image.
+void DisplayOpeningTextGraphic() {
+    ClearScreenWithoutInput();
+    CH("            .              .                    .                *             .", 9);cout << endl;
+    CH("    +                           .                                     .         ", 11);cout << endl;
+    CH(" .             ___/|                ___/|                ___/|                  ", 15);cout << endl;
+    CH("          .   /___||               /___||               /___||               .  ", 15);cout << endl;
+    CH("              ____||____           ____||____           ____||____              ", 15);cout << endl;
+    CH("             |__       _|         |_ _       |         |___       |         +   ", 11);cout << endl;
+    CH("     .       |_     _ __|         |        __|         |      _ __|     .       ", 11);cout << endl;
+    CH(" *           |___      _|-_______-|_        _|-_______-|_      ___|            .", 9);cout << endl;
+    CH("             | _      '            '          '            '    _ |             ", 9);cout << endl;
+    CH("          ... \\ _                                      _  _    _ /      ....    ", 9);cout << endl;
+    CH("  ''-_--_.     \\ _   _____ __  __________________   __ ___ _  _ /  _--_.    ..  ", 1);cout << endl;
+    CH("   _/    \\  _-- | _ ____|__   |_  ____________  _|    |_ _  |  | _/_   \\__    . ", 1);cout << endl;
+    CH("  /       \\/    |    |___ _     ||/TTTTTTTTTT\\||    __  _| _ __|    \\  /  \\     ", 1);cout << endl;
+    CH("          /     |___    |   _ __||            || _ ___|_ _  | _|     .     ..   ", 13);cout << endl;
+    CH("   _'..''--___  |               ||            ||               |  ___--''.._    ", 13);cout << endl;
+    ChangeColor(9);
+    cout << Line << endl;
+}
+
 // Displays intro text one character at a time. Any '|'s in the text denote a pause.
 void OpeningTextScroll() {
+    DisplayOpeningTextGraphic();
+    Sleep(1400);
+    Scroll("Once upon a time, |a warrior left his wife and child in hopes of overcoming"); cout << endl;
+    Scroll("the Monster Arena,| a challenging sequence of battles run by a twisted King.");
+    Sleep(1400);
+    DisplayOpeningTextGraphic();
+    Scroll("He fought marvelously, |swiftly beating every monster until he reached"); cout << endl;
+    Scroll("the final fight against the king's prized fighter. ||After many hours, |he slew"); cout << endl;
+    Scroll("the creature with a mighty blow.");
+    Sleep(1400);
+    DisplayOpeningTextGraphic();
+    Scroll("The king, |seized by a fit of anger, |cast a magic blast at the warrior that "); cout << endl;
+    Scroll("turned him into a mindless beast. ||The king set this beast as his new champion.");
+    Sleep(1400);
+    DisplayOpeningTextGraphic();
+    Scroll("When the King died, |the monsters remained,| but the Monster Arena fell into ruin."); cout << endl;
+    Scroll("||No-one ever went back into that arena to free the warrior.");
+    Sleep(1400);
+    DisplayOpeningTextGraphic();
+    Sleep(600);
+    Scroll("No-one, |that is, |until his son arrived.");
+    Sleep(2800);
     ClearScreenWithoutInput();
-    Sleep(1000);
-    Scroll("Once upon a time, |a warrior left his wife and child in hopes of overcoming the Monster Arena,|"); cout << endl;
-    Scroll("a challenging sequence of battles run by a twisted King."); cout << endl << endl;
-    Sleep(1000);
-    Scroll("He fought marvelously, |swiftly beating every monster until he reached the final fight against"); cout << endl;
-    Scroll("the king's prized monster. ||After many hours, |he slew the creature with a mighty blow."); cout << endl << endl;
-    Sleep(1000);
-    Scroll("The king, |seized by a fit of anger, |cast a magic blast at the warrior that turned him into a"); cout << endl;
-    Scroll("mindless beast. ||The king set this beast as his new champion."); cout << endl << endl;
-    Sleep(1000);
-    Scroll("When the King died, |the monsters remained but the Monster Arena fell into ruin. ||No-one ever"); cout << endl;
-    Scroll("went back into that arena to free the warrior."); cout << endl << endl;
-    Sleep(1000);
-    Scroll("No-one, |that is, |until his son arrived."); cout << endl;
-    Sleep(2000);
-    ClearScreenWithoutInput();
+    Sleep(800);
     while(kbhit()) getch(); // Clear any keyboard inputs entered while the text was scrolling.
 }
 
@@ -874,7 +904,7 @@ void ArenaMenuPage2() {
     cout << "Please enter the Gauntlet that would you like to challenge: " << endl;
 }
 
-//Function to display Player and Monster Stats: Each CH() call is changing the color of the text inside it to the entered number (CH defined above).
+//Function to display Player and Monster Stats: Each CH() call is changing the color of the text inside it to the entered number (CH defined below).
 void DisplayStats(int MonNum){
     ClearScreenWithoutInput();
     ChangeColor(11);
