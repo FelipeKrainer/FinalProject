@@ -79,6 +79,7 @@ bool MonsterTurn(int);                                                  // Compu
 bool PlayerTurn(int);                                                   // Computes the players damage to the monster.
 bool FinalBattle();                                                     // The final boss battle.
 void DisplayFinalBattle(int);                                           // Displays the final boss fight graphic.
+void DisplaySunrise();                                                  // Displays the end screen.
 
 void DisplayStats(int);                                                 // Displays Player and Monster stats.
 std::string toLowerCase(const std::string &str);                        // Changes user input to lower case.
@@ -142,7 +143,7 @@ int main() {
     MainMenuInput:                                                                                                  // The main menu option box.
     cin >> UserInput;
     UserInput =  toLowerCase(UserInput);
-    Validated = Validate(UserInput, "g", "p", "s", "d");
+    Validated = Validate(UserInput, "m", "p", "s", "d");
     // Repeats the question if input is incorrect.
     if (!Validated) {std::cout << "Invalid entry! Please try again!" << endl; goto MainMenuInput;} 
     if (UserInput == "p") {                                                                                         //Chose to buy potions.
@@ -174,7 +175,7 @@ int main() {
         } else {                                                                                                    // Chose to leave potion shop.
             goto MainMenu;
         }
-    } else if (UserInput == "g"){                                                                                   // Chose to enter an arena.
+    } else if (UserInput == "m"){                                                                                   // Chose to enter an arena.
         ArenaMenu:                                                                                              
         ArenaMenuPage1();
         ArenaInputPg1:                                                                                              // Arena menu page 1.
@@ -204,7 +205,7 @@ int main() {
             ArenaMenuPage2();
             ArenaInputPg2:                                                                                          // Arena menu page 2.
             cin >> UserInput;
-            UserInput=  toLowerCase(UserInput);
+            UserInput =  toLowerCase(UserInput);
             Validated = Validate(UserInput, "d", "e", "f", "g", "p", "n");
             if (!Validated) {cout << "Invalid entry! Please try again!" << endl; goto ArenaInputPg2;}
             if (UserInput == "d") {                                                                                 // Chose Silver Arena.
@@ -234,8 +235,14 @@ int main() {
             } else if (UserInput == "g") {                                                                          // Chose Final Boss.
                 if (Arena6Beat == true) {
                     CurrentArena = 7;
-                    FinalBattle();
-                    goto MainMenu;
+                    if (FinalBattle()) {
+                        ClearScreenWithoutInput();
+                        Sleep(2500);
+                        DisplaySunrise();
+                        return 0;
+                    } else {
+                        goto MainMenu;
+                    }
                 } else {
                     std::cout << "Invalid entry! Please try again." << endl; goto ArenaInputPg2;
                 }
@@ -626,7 +633,7 @@ void SwordAnimation1() {
     cout << "Gauntlets fighting strange and terrifying monsters. As you battle, you'll" << endl;
     cout << "gain gold that can be used to purchase potions, and experience points that" << endl;
     cout << "can help you level up and gain better stats, such as Health, Attack, and" << endl;
-    cout << "Defence. You'll have to beat all six gauntlets to become the Champion." << endl;
+    cout << "Defence. You'll have to beat all six gauntlets to win the game." << endl;
     cout << Line << endl;
 }
 
@@ -656,7 +663,7 @@ void SwordAnimation2() {
     cout << "Gauntlets fighting strange and terrifying monsters. As you battle, you'll" << endl;
     cout << "gain gold that can be used to purchase potions, and experience points that" << endl;
     cout << "can help you level up and gain better stats, such as Health, Attack, and" << endl;
-    cout << "Defence. You'll have to beat all six gauntlets to become the Champion." << endl;
+    cout << "Defence. You'll have to beat all six gauntlets to win the game." << endl;
     cout << Line << endl;
     ChangeColor(11);
 }
@@ -674,6 +681,7 @@ void Introduction() {
 // Displays the starting menu screen.
 void OpeningMenuScreen (){
     ClearScreenWithoutInput();
+    ChangeColor(9);
     std::cout << "\t\t\t*************************************\n";
     std::cout << "\t\t\t*             GAME MENU             *\n";
     std::cout << "\t\t\t*************************************\n";
@@ -684,6 +692,8 @@ void OpeningMenuScreen (){
     std::cout << "\t\t\t*                                   *\n";
     std::cout << "\t\t\t*************************************\n";
     std::cout << Line << endl;
+    ChangeColor(11);
+    std::cout << "Please enter what you want to do: " << endl;
 }
 
 // Displays the opening text-scroll image.
@@ -756,7 +766,7 @@ void MainMenu() {
     cout << "        ---====/                                        \\=======--------        " << endl;
     ChangeColor(9);
     std::cout << Line << endl;
-    std::cout << "'g' = Enter a Gauntlet, 'p' = Buy potions, 'd' = Data screen, 's' = Save." << endl;
+    std::cout << "'m' = Enter the Monster Arena, 'p' = Buy potions, 'd' = Data screen, 's' = Save." << endl;
     std::cout << Line << endl;
     ChangeColor(11);
     std::cout << "Please enter what you want to do: " << endl;
@@ -874,9 +884,9 @@ void ArenaMenuPage1() {
     cout << "        _______________________________________________________________     " << endl;
     ChangeColor(9);
     cout << Line << endl;
-    cout << "'a' = Wooden Arena" << endl;
-    if (Arena1Beat == true) {cout << "'b' = Tin Arena" << endl;} else {cout << "'b' = [Locked]" << endl;}
-    if (Arena2Beat == true) {cout << "'c' = Bronze Arena" << endl;} else {cout << "'c' = [Locked]" << endl;}
+    cout << "'a' = Wooden Gauntlet" << endl;
+    if (Arena1Beat == true) {cout << "'b' = Tin Gauntlet" << endl;} else {cout << "'b' = [Locked]" << endl;}
+    if (Arena2Beat == true) {cout << "'c' = Bronze Gauntlet" << endl;} else {cout << "'c' = [Locked]" << endl;}
     cout << "'p' = Page ->" << endl;
     cout << "'n' = Nevermind..." << endl;
     cout << Line << endl;
@@ -901,9 +911,9 @@ void ArenaMenuPage2() {
     cout << "        _______________________________________________________________     " << endl;
     ChangeColor(9);
     cout << Line << endl;
-    if (Arena3Beat == true) {cout << "'d' = Silver Arena" << endl;} else {cout << "'d' = [Locked]" << endl;}
-    if (Arena4Beat == true) {cout << "'e' = Gold Arena" << endl;} else {cout << "'e' = [Locked]" << endl;}
-    if (Arena5Beat == true) {cout << "'f' = Platinum Arena" << endl;} else {cout << "'f' = [Locked]" << endl;}
+    if (Arena3Beat == true) {cout << "'d' = Silver Gauntlet" << endl;} else {cout << "'d' = [Locked]" << endl;}
+    if (Arena4Beat == true) {cout << "'e' = Gold Gauntlet" << endl;} else {cout << "'e' = [Locked]" << endl;}
+    if (Arena5Beat == true) {cout << "'f' = Platinum Gauntlet" << endl;} else {cout << "'f' = [Locked]" << endl;}
     if (Arena6Beat == true) {cout << "'g' = LegacyBeast" << endl;}
     cout << "'p' = Page <-" << endl;
     cout << "'n' = Nevermind..." << endl;
@@ -990,6 +1000,7 @@ bool FinalBattle() {
                 } 
             }
             Sleep(600);
+            while(kbhit()) getch(); // Clear any keyboard inputs entered while the battle was looping.
         }
 
         // Checks if the player lost or gave up and returns false if so.
@@ -1058,6 +1069,48 @@ void DisplayFinalBattle(int Color) {
     std::cout << ArrayOfMonsters[36].GetName() <<" Stats: (Current HP: "
          << ArrayOfMonsters[36].GetCurrentHP() << ")"<< endl;
     std::cout << Line << endl;
+}
+
+void DisplaySunrise() {
+    IncorrectInput:
+    ClearScreenWithoutInput();
+    while(kbhit()) getch(); // Clear any keyboard inputs entered while the Sleep() function was active.
+    ChangeColor(15); 
+    cout << "\n                         _________  _    _    ______                            " << endl;
+    cout << "                         \\__   __/ | |  | |  |  ____|                           " << endl;
+    cout << "                            | |    | |__| |  | |__                              " << endl;
+    cout << "                            | |    | |  | |  | |____                            " << endl;
+    ChangeColor(14); 
+    cout << "                            |_|    |_|  |_|  |______|                           " << endl;
+    cout << "                          ______    __    _    _____                            " << endl;
+    cout << "                         |  ____|  |  \\  | |  |  _  \\                           " << endl;
+    cout << "                         | |__     |   \\_| |  | | \\  \\                          " << endl;
+    CH("  ''''===---___          ", 9);CH("|  __|    |  _    |  | | [  |", 14);CH("         ___---===''''    ", 9); cout << endl;
+    CH("           .__ \\         ", 9);CH("| |____   | | \\   |  | |_/  /", 6);CH("        / __. ___.        ", 9); cout << endl;
+    CH("              \\ \\_____   ", 1);CH("|______|  |_|  \\__|  |_____/ ", 6);CH("  _____/ /                ", 1); cout << endl;
+    CH("                  .__ \\__ ", 13);CH("                          ", 6);CH(" __/ __.                    ", 13); cout << endl;
+    CH("                     \\   \\", 13);CH(" - --=-============-=-- - ", 15);CH("/___/                       ", 13); cout << endl;
+    CH("                 _ _ _\\   ", 13);CH("  - ------------------- - ", 11);CH("   /_ _ _                   ", 13); cout << endl;
+    CH("            ' ' '         ", 13);CH("       - --------- -      ", 9);CH("          ' ' '             ", 13); cout << endl;
+    ChangeColor(1);
+    cout << "                                     - - -                                      " << endl;
+    ChangeColor(13);
+    cout << "                                       _                                        " << endl;
+    ChangeColor(9);
+    cout << "                 _____     _..__     _____     __.__     __.._                  " << endl;
+    ChangeColor(1);
+    cout << "      .  . . .-='     '==='     '==='     '==='     '==='     '=-. . .  .       " << endl;
+    ChangeColor(13);
+    cout << "             ..   .:.                                  .:..      .. .           \n" << endl;
+    ChangeColor(9);
+    cout << Line << endl;
+    ChangeColor(11);
+    cout << "Enter 'c' to close the game. " << endl;
+    cin >> UserInput;
+    UserInput = toLowerCase(UserInput);
+    if (UserInput != "c"){
+        goto IncorrectInput;
+    }
 }
 
 // Validates input compared to different characters. Overloaded.
