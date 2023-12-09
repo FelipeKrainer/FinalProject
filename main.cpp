@@ -79,6 +79,8 @@ bool MonsterTurn(int);                                                  // Compu
 bool PlayerTurn(int);                                                   // Computes the players damage to the monster.
 bool FinalBattle();                                                     // The final boss battle.
 void DisplayFinalBattle(int);                                           // Displays the final boss fight graphic.
+void DisplayFatherAnimation(int);                                       // Displays the in-battle father animation.
+void ShowFatherAndSon();                                                // Displays the father and son image.
 void DisplaySunrise();                                                  // Displays the end screen.
 
 void DisplayStats(int);                                                 // Displays Player and Monster stats.
@@ -133,8 +135,8 @@ int main() {
         Sleep(1200);
     } else if (UserInput == "s"){
         OpeningTextScroll();
-    } else {
-        goto Exit; // Jumps to the end of the main function.
+    } else { // If player selects exit, then close game.
+        return 0;
     }
     MainMenu: 
     ThePlayer.SetCurrentHP(ThePlayer.GetMaxHP());
@@ -235,12 +237,15 @@ int main() {
             } else if (UserInput == "g") {                                                                          // Chose Final Boss.
                 if (Arena6Beat == true) {
                     CurrentArena = 7;
+                    // If player beats the final boss, then show the credits and ending screen.
                     if (FinalBattle()) {
                         ClearScreenWithoutInput();
-                        Sleep(2500);
+                        Sleep(300);
+                        ShowFatherAndSon();
+                        Sleep(5000);
                         DisplaySunrise();
                         return 0;
-                    } else {
+                    } else { 
                         goto MainMenu;
                     }
                 } else {
@@ -259,7 +264,6 @@ int main() {
         goto MainMenu;
     }
     
-    Exit: // Jumped to from the continue/new game option menu.
     return 0;
 }
 
@@ -1016,18 +1020,26 @@ bool FinalBattle() {
             for (int i = 1; i < 16; i++) {
                 DisplayFinalBattle(i);
                 Sleep(600 * (TimeBetweenColorFlashes));
-                TimeBetweenColorFlashes -= .04;
+                TimeBetweenColorFlashes -= 0.04;
                 if (TimeBetweenColorFlashes <= 0) {
                     TimeBetweenColorFlashes = 0.04;
                 }
             } 
         }
-
-        // Displays the battle screen with the boss hidden and prints the victory text.
-        DisplayFinalBattle(0);
+        // Display greyed out boss.
+        DisplayFinalBattle(8);
+        Sleep(200);
+        // Displays the battle screen with the father's animation and prints the victory text.
+        DisplayFatherAnimation(0);
+        Sleep(2000);
+        DisplayFatherAnimation(1);
         Sleep(500);
+        DisplayFatherAnimation(2);
+        Sleep(3000);
         cout << Line << endl;
-        cout << "You defeated the " << ArrayOfMonsters[36].GetName() << "!" << endl;
+        ChangeColor(6);
+        cout << "You saved your father!" << endl;
+        ChangeColor(9);
         cout << Line << endl;
         Sleep(3000);
         return true;
@@ -1040,17 +1052,79 @@ void DisplayFinalBattle(int Color) {
     ClearScreenWithoutInput();
     ChangeColor(11);
     cout << " O *                                                                          " << endl;
-    CH("                    /\\                   ", Color);CH("                               * o   ", 11);cout << endl;
-    CH("              _-/\\=/* \\=/\\-_             ", Color);CH("                                 .   ", 11);cout << endl;
-    CH("            _/      /\\      \\_           ", Color);CH("                                     ", 15);cout << endl;
-    CH("           /  *   _ /\\ _      \\          ", Color);CH("                     /\\              ", 15);cout << endl;
-    CH("          |*     //    \\\\      |         ", Color);CH("                    /  \\             ", 15);cout << endl;
-    CH("          |  \\_ | \\____/ | _/  |         ", Color);CH("                 __/    \\__          ", 15);cout << endl;
-    CH("         /  |   \\ /*   \\ /   |  \\        ", Color);CH("                /__________\\         ", 15);cout << endl;
-    CH("    _ _='  _\\    \\______/    /  _'=_ _   ", Color);CH("         /\\      (|\\_____/|)         ", 15);cout << endl;
-    CH("   / / / }_/-'=- \\ X  X / -='-\\_{ \\ \\ \\  ", Color);CH("         \\ \\      \\______/           ", 15);cout << endl;
-    CH("   \\|\\|\\|         \\ '' /         |/|/|/  ", Color);CH("          \\ \\     / \\/\\/\\/\\          ", 11);cout << endl;
-    CH("                   |\\/|                  ", Color);CH("           \\ \\   /         \\         ", 9);cout << endl;
+    CH("                    /\\                   ", Color);CH("                               * o   \n", 11);
+    CH("              _-/\\=/* \\=/\\-_             ", Color);CH("                                 .   \n", 11);
+    CH("            _/      /\\      \\_           ", Color);CH("                                     \n", 15);
+    CH("           /  *   _ /\\ _      \\          ", Color);CH("                     /\\              \n", 15);
+    CH("          |*     //    \\\\      |         ", Color);CH("                    /  \\             \n", 15);
+    CH("          |  \\_ | \\____/ | _/  |         ", Color);CH("                 __/    \\__          \n", 15);
+    CH("         /  |   \\ /*   \\ /   |  \\        ", Color);CH("                /__________\\         \n", 15);
+    CH("    _ _='  _\\    \\______/    /  _'=_ _   ", Color);CH("         /\\      (|\\_____/|)         \n", 15);
+    CH("   / / / }_/-'=- \\ X  X / -='-\\_{ \\ \\ \\  ", Color);CH("         \\ \\      \\______/           \n", 15);
+    CH("   \\|\\|\\|         \\ '' /         |/|/|/  ", Color);CH("          \\ \\     / \\/\\/\\/\\          \n", 11);
+    CH("                   |\\/|                  ", Color);CH("           \\ \\   /         \\         \n", 9);
+    ChangeColor(1);
+    cout << "++..'.                      ...  .'.oOo.   A         \\ \\ / |=======| |      \n";
+    ChangeColor(13);
+    cout << "   -  - --__--A_______________---_________/ \\_A____A________________--=-_-- - \n";
+    if (ThePlayer.GetCurrentHP() <= 5){
+        ChangeColor(12);
+    }else {
+        ChangeColor(9);
+    }
+    cout << Line << endl;
+    cout << "Player Stats: (HP: " << ThePlayer.GetCurrentHP() << "/" <<ThePlayer.GetMaxHP()
+         << ") (EXP: " << ThePlayer.GetCurrentEXP() << ") (Needed EXP: " << ThePlayer.GetEXPToNextLevel()
+         << ") (Gold: " << ThePlayer.GetGold() << ")" << endl;
+    std::cout << Line << endl;
+    // Displaying monster health information
+    std::cout << ArrayOfMonsters[36].GetName() <<" Stats: (Current HP: "
+         << ArrayOfMonsters[36].GetCurrentHP() << ")"<< endl;
+    std::cout << Line << endl;
+}
+
+// Displays the father's recovery cutscene. 
+void DisplayFatherAnimation(int Frame) {
+    string ArrayOfFatherLines[7]; // An array holding each father sprite.
+    if (Frame == 0) {
+        ArrayOfFatherLines[0] = "        ";
+        ArrayOfFatherLines[1] = "        ";
+        ArrayOfFatherLines[2] = "        ";
+        ArrayOfFatherLines[3] = "        ";
+        ArrayOfFatherLines[4] = "   __   ";
+        ArrayOfFatherLines[5] = " /'  '\\ ";
+        ArrayOfFatherLines[6] = "n </\\> n";
+    } else if (Frame == 1) {
+        ArrayOfFatherLines[0] = "        ";
+        ArrayOfFatherLines[1] = "        ";
+        ArrayOfFatherLines[2] = "  _/\\_  ";
+        ArrayOfFatherLines[3] = " /'v '\\ ";
+        ArrayOfFatherLines[4] = "/ \\  / |";
+        ArrayOfFatherLines[5] = "| [_[] n";
+        ArrayOfFatherLines[6] = "n |/ [_ ";
+    } else if (Frame == 2) {
+        ArrayOfFatherLines[0] = "  _/\\_  ";
+        ArrayOfFatherLines[1] = "  _v _  ";
+        ArrayOfFatherLines[2] = " / __ \\ ";
+        ArrayOfFatherLines[3] = "| \\  / |";
+        ArrayOfFatherLines[4] = "n [__] n";
+        ArrayOfFatherLines[5] = "  |/\\|  ";
+        ArrayOfFatherLines[6] = " _]  [_ "; 
+    }
+    ClearScreenWithoutInput();
+    ChangeColor(11);
+    cout << " O *                                                                          " << endl;
+    CH("                                          ", 13);CH("                              * o   ", 11);cout << endl;
+    CH("                                          ", 13);CH("                                .   ", 11);cout << endl; ChangeColor(15);
+    cout << "                   " << ArrayOfFatherLines[0];CH("                                     ", 15);cout << endl;
+    cout << "                   " << ArrayOfFatherLines[1];CH("                                   /\\              ", 15);cout << endl;
+    cout << "                   " << ArrayOfFatherLines[2];CH("                                  /  \\             ", 15);cout << endl;
+    cout << "                   " << ArrayOfFatherLines[3];CH("                               __/    \\__          ", 15);cout << endl;
+    cout << "                   " << ArrayOfFatherLines[4];CH("                              /__________\\         ", 15);cout << endl;
+    cout << "                   " << ArrayOfFatherLines[5];CH("                       /\\      (|\\_____/|)         ", 15);cout << endl;
+    cout << "                   " << ArrayOfFatherLines[6];CH("                       \\ \\      \\______/           ", 15);cout << endl;
+    CH("                                          ", 13);CH("         \\ \\     / \\/\\/\\/\\          ", 11);cout << endl;
+    CH("                                          ", 13);CH("          \\ \\   /         \\         ", 9);cout << endl;
     ChangeColor(1);
     cout << "++..'.                      ...  .'.oOo.   A         \\ \\ / |=======| |      " << endl;
     ChangeColor(13);
@@ -1069,6 +1143,33 @@ void DisplayFinalBattle(int Color) {
     std::cout << ArrayOfMonsters[36].GetName() <<" Stats: (Current HP: "
          << ArrayOfMonsters[36].GetCurrentHP() << ")"<< endl;
     std::cout << Line << endl;
+}
+
+void ShowFatherAndSon() {
+    ClearScreenWithoutInput();
+    ChangeColor(15);
+    cout << "\n\n\n\n\n\n";
+    cout << "\t\t\t\t    u   _/\\_             \n";
+    cout << "\t\t\t\t     \\___v _      _/\\_  o\n";
+    cout << "\t\t\t\t       | __ \\     _()__/ \n";ChangeColor(11);
+    cout << "\t\t\t\t        \\  / |   /\\__/   \n";ChangeColor(9);
+    cout << "\t\t\t\t        [__] n  o /  \\   \n";ChangeColor(1);
+    cout << "\t\t\t\t        |/\\|      |/\\|   \n";ChangeColor(13);
+    cout << "\t\t\t\t       _]  [_    _=  =_  \n\n";ChangeColor(9);
+    
+    cout << "--_-_--''-'-==--'-':-----'---'--^-----==----'-||-'--'----^----'-_--===----'---=^-'-_-'---'--:-\n" << endl;
+
+    cout << "\t\t\t";Scroll("Program Managers:              Felipe Krainer\n");
+    cout << "\t\t\t";Scroll("                               Samuel Johnson\n\n");
+    Sleep(200);
+    cout << "\t\t\t";Scroll("Programming:                   Felipe Krainer\n");
+    cout << "\t\t\t";Scroll("                               Samuel Johnson\n\n");
+    Sleep(200);
+    cout << "\t\t\t";Scroll("Art Director:                  Samuel Johnson\n\n\n");
+    Sleep(200);
+    cout << "\t\t\t     ";Scroll("Thanks for playing!");
+    Sleep(200);
+    Scroll(" You're the best!\n\n");
 }
 
 void DisplaySunrise() {
