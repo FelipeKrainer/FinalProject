@@ -362,7 +362,6 @@ void Arena() {
         ArrayOfMonsters[i].SetCurrentHP(ArrayOfMonsters[i].GetMaxHP());
 
         while (PlayerIsAlive && MonsterIsAlive) {
-            Sleep(800);
             ClearScreenWithoutInput();
             if (ThePlayer.GetCurrentHP() <= 5) {
                 ChangeColor(12);
@@ -370,7 +369,6 @@ void Arena() {
                 ChangeColor(9);
             }
             DisplayStats(i);
-            Sleep(200);
 
             if (ArrayOfMonsters[i].GetAG() < ThePlayer.GetAG()) {
                 MonsterIsAlive = PlayerTurn(i);
@@ -428,13 +426,16 @@ bool MonsterTurn(int MonsterNumber) {
             DamageDealt = 1;
         }
         ChangeColor(12);
+        ThePlayer.LowerCurrentHP(DamageDealt);
+        // If monster is faster than player, save damage text, refresh screen, then reprint damage text.
+        if (ArrayOfMonsters[MonsterNumber].GetAG() > ThePlayer.GetAG()) {
+            DisplayStats(MonsterNumber);
+        }
         cout << ArrayOfMonsters[MonsterNumber].GetName() << " "
             << ArrayOfMonsters[MonsterNumber].GetMethodOfAttack()
             << " you for " << DamageDealt << " damage!" << endl;
-        ThePlayer.LowerCurrentHP(DamageDealt);
-        Sleep(800);
-        DisplayStats(MonsterNumber);
-
+        Sleep(200);
+        //DisplayStats(MonsterNumber);
         if (ThePlayer.GetCurrentHP() <= 0) {
             ChangeColor(12);
             cout << "Too bad! You've lost the Gauntlet!" << endl;
@@ -471,8 +472,16 @@ bool PlayerTurn(int MonsterNumber) {
             if (DamageDealt <= 0) {
                 DamageDealt = 1;
             }
-            ChangeColor(9);
-            cout << "You hit the enemy for " << DamageDealt << " damage!" << endl;
+            MissChance = HitChanceDistribution(Generator);
+            if (MissChance == 20) {
+                DamageDealt *= 2;
+                ChangeColor(13);
+                cout << "Critical hit! You hit the enemy for " << DamageDealt << " damage!" << endl;
+            } else {
+                ChangeColor(9);
+                cout << "You hit the enemy for " << DamageDealt << " damage!" << endl;
+            }
+            
             ArrayOfMonsters[MonsterNumber].LowerCurrentHP(DamageDealt);
             Sleep(200);
             if (ArrayOfMonsters[MonsterNumber].GetCurrentHP() <= 0) {
