@@ -362,6 +362,7 @@ void Arena() {
         ArrayOfMonsters[i].SetCurrentHP(ArrayOfMonsters[i].GetMaxHP());
 
         while (PlayerIsAlive && MonsterIsAlive) {
+            Sleep(800);
             ClearScreenWithoutInput();
             if (ThePlayer.GetCurrentHP() <= 5) {
                 ChangeColor(12);
@@ -369,7 +370,8 @@ void Arena() {
                 ChangeColor(9);
             }
             DisplayStats(i);
-            Sleep(100);
+            Sleep(200);
+
             if (ArrayOfMonsters[i].GetAG() < ThePlayer.GetAG()) {
                 MonsterIsAlive = PlayerTurn(i);
                 if (HasRunAway) {
@@ -430,7 +432,9 @@ bool MonsterTurn(int MonsterNumber) {
             << ArrayOfMonsters[MonsterNumber].GetMethodOfAttack()
             << " you for " << DamageDealt << " damage!" << endl;
         ThePlayer.LowerCurrentHP(DamageDealt);
-        Sleep(200);
+        Sleep(800);
+        DisplayStats(MonsterNumber);
+
         if (ThePlayer.GetCurrentHP() <= 0) {
             ChangeColor(12);
             cout << "Too bad! You've lost the Gauntlet!" << endl;
