@@ -63,6 +63,7 @@ int BluePotionHeal = 32;                                                        
 int PurplePotionHeal = 48;                                                                               // -
 
 int CurrentArena = 0;                                                                                    // The arena the player is currently in.
+int DeathCounter = 0;                                                                                    // The number of times the player has died.
 bool HasRunAway = false;                                                                                 // Holds whether the player has given up on an arena.
 
 bool Arena1Beat = false;                                                                                 // Whether the player has beat a given arena.
@@ -298,6 +299,7 @@ void SaveToFile(const std::string& fileName) {
                     << RedPotionCost << ' '
                     << BluePotionCost << ' '
                     << PurplePotionCost << ' '
+                    << DeathCounter << ' '
                     << Arena1Beat << ' '
                     << Arena2Beat << ' '
                     << Arena3Beat << ' '
@@ -325,7 +327,7 @@ void LoadFromFile(const std::string& fileName) {
         if (inFile.is_open()) {
             inFile >> level >> maxHP >> ATK >> DEF >> AG >> currentEXP >> expToNextLevel
                    >> gold >> RedPotionsInBag >> BluePotionsInBag >> PurplePotionsInBag
-                   >> RedPotionCost >> BluePotionCost >> PurplePotionCost >> Arena1Beat
+                   >> RedPotionCost >> BluePotionCost >> PurplePotionCost >> DeathCounter >> Arena1Beat
                    >> Arena2Beat >> Arena3Beat >> Arena4Beat >> Arena5Beat >> Arena6Beat;
 
             inFile.close();
@@ -425,12 +427,12 @@ bool MonsterTurn(int MonsterNumber) {
         if (DamageDealt <= 0) {
             DamageDealt = 1;
         }
-        ChangeColor(12);
         ThePlayer.LowerCurrentHP(DamageDealt);
         // If monster is faster than player, save damage text, refresh screen, then reprint damage text.
         if (ArrayOfMonsters[MonsterNumber].GetAG() > ThePlayer.GetAG()) {
             DisplayStats(MonsterNumber);
         }
+        ChangeColor(12);
         cout << ArrayOfMonsters[MonsterNumber].GetName() << " "
             << ArrayOfMonsters[MonsterNumber].GetMethodOfAttack()
             << " you for " << DamageDealt << " damage!" << endl;
@@ -439,6 +441,7 @@ bool MonsterTurn(int MonsterNumber) {
         if (ThePlayer.GetCurrentHP() <= 0) {
             ChangeColor(12);
             cout << "Too bad! You've lost the Gauntlet!" << endl;
+            DeathCounter++;
             Sleep(2000);
             ThePlayer.SetCurrentHP(ThePlayer.GetMaxHP());
             return false;
@@ -804,7 +807,7 @@ void StatsScreen(){
     CH("|      |/()   / ___ \\ \\ -+- /     |",12);CH("*********************************************\n",9);
     CH("|            /_/ _ \\_\\ \\_|_/      |",12);CH("            Experience:       ",6);cout << ThePlayer.GetCurrentEXP() << endl;
     CH("|             |__|__|             |",12);CH("            Gold:             ",6);cout << ThePlayer.GetGold() << endl;
-    CH("|            _|_ | _|_            |",12);CH("            Defeats: ",6);cout << endl;
+    CH("|            _|_ | _|_            |",12);CH("            Defeats:          ",6);cout << DeathCounter << endl;
     CH("|_      - --|*  \\|/   |-- -      _|",12);CH("*********************************************",9);cout << endl;
     cout << Line << endl;
     cout << "Enter 'n' to go back to main menu. " << endl;
@@ -844,9 +847,9 @@ void PotionScreen() {
     ChangeColor(9);
     cout << Line << endl;
     cout << "You have " << ThePlayer.GetGold() << " Gold in your bag."<< endl;
-    cout << "'r' = Red Potion    ($" << RedPotionCost << ")" << " (" << RedPotionsInBag << " in bag)" << endl;
-    cout << "'b' = Blue Potion   ($" << BluePotionCost << ")" << " (" << BluePotionsInBag << " in bag)" << endl;
-    cout << "'p' = Purple Potion ($" << PurplePotionCost << ")" << " (" << PurplePotionsInBag << " in bag)" << endl;
+    cout << "'r' = Red Potion"<< "("<<RedPotionHeal<<" Health)"<<"    ($" << RedPotionCost << ")" << " (" << RedPotionsInBag << " in bag)" << endl;
+    cout << "'b' = Blue Potion"<< "("<<BluePotionHeal<<" Health)"<<"   ($" << BluePotionCost << ")" << " (" << BluePotionsInBag << " in bag)" << endl;
+    cout << "'p' = Purple Potion"<< "("<<PurplePotionHeal<<" Health)"<<" ($" << PurplePotionCost << ")" << " (" << PurplePotionsInBag << " in bag)" << endl;
     cout << "'n' = Nevermind..." << endl;
     cout << Line << endl;
     ChangeColor(11);
