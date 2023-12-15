@@ -160,19 +160,19 @@ int main() {
         if (UserInput == "r") {                                                                                     // Chose to buy Red Potion.
             if (ThePlayer.GetGold() < RedPotionCost) {std::cout << "You do not have enough gold to buy that!" << endl; goto PotionMenuInput;}
             ThePlayer.LowerGold(RedPotionCost);
-            RedPotionCost *= 1.2;
+            RedPotionCost *= 1.1;
             RedPotionsInBag += 1;
             goto PotionMenu;
         } else if (UserInput == "b") {                                                                              // Chose to buy Blue Potion.
             if (ThePlayer.GetGold() < BluePotionCost) {std::cout << "You do not have enough gold to buy that!" << endl; goto PotionMenuInput;}
             ThePlayer.LowerGold(BluePotionCost);
-            BluePotionCost *= 1.2;
+            BluePotionCost *= 1.1;
             BluePotionsInBag += 1;
             goto PotionMenu;
         } else if (UserInput == "p") {                                                                              // Chose to buy Purple Potion.
             if (ThePlayer.GetGold() < PurplePotionCost) {std::cout << "You do not have enough gold to buy that!" << endl; goto PotionMenuInput;}
             ThePlayer.LowerGold(PurplePotionCost);
-            PurplePotionCost *= 1.2;
+            PurplePotionCost *= 1.1;
             PurplePotionsInBag += 1;
             goto PotionMenu;
         } else {                                                                                                    // Chose to leave potion shop.
