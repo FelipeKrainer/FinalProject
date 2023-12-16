@@ -884,7 +884,12 @@ bool BattlePotionMenu(string PotionColor, int PotionHealAmount, int MonsterNumbe
         else{PurplePotionsInBag--;}
                 
         Sleep(1000);
-        DisplayStats(MonsterNumber);
+        if (MonsterNumber != 36) {
+            DisplayStats(MonsterNumber);
+        } else {
+            DisplayFinalBattle(12);
+        }
+        
         return true;
     } else {
         std::cout << "You don't have any " << PotionColor << " Potions to use! " <<endl;
