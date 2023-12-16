@@ -430,7 +430,12 @@ bool MonsterTurn(int MonsterNumber) {
         ThePlayer.LowerCurrentHP(DamageDealt);                                               // Decrease player current health.
                                                                                              // If monster is faster than player, save damage text, refresh screen, then reprint damage text.
         if (ArrayOfMonsters[MonsterNumber].GetAG() > ThePlayer.GetAG()) {
-            DisplayStats(MonsterNumber);
+            if (MonsterNumber != 36) {
+                DisplayStats(MonsterNumber);
+            } else {
+                DisplayFinalBattle(12);
+            }
+            
         }
         ChangeColor(12);
         cout << ArrayOfMonsters[MonsterNumber].GetName() << " "                              // Displaying monster attack text.
