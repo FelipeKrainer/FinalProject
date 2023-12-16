@@ -119,18 +119,18 @@ bool Validate(string, string, string);                                  // Valid
 // ---------------------------------------------------------------------- Main Program:
 
 int main() {
-    FillArrayOfMonsterObjects();
-    FillArrayOfMonsterSprites();
+    FillArrayOfMonsterObjects();                                        // Setting the monster values from the txt file.
+    FillArrayOfMonsterSprites();                                        
     HasRunAway = false;
-    Introduction();
+    Introduction();                                                     // Displaying the sword animation.
     std::cout << "Press Enter to begin..." << endl;
     std::cin.get();
     SaveScreen:
-    OpeningMenuScreen();
+    OpeningMenuScreen();                                                // Displaying the menu animation and asking if user wants to start new game, or continue.
     cin >> UserInput;
     UserInput = toLowerCase(UserInput);
     Validated = Validate(UserInput, "c", "s", "e");
-    if (!Validated) {std::cout << "Invalid entry! Please try again!" << endl; goto SaveScreen;}
+    if (!Validated) {std::cout << "Invalid entry! Please try again!" << endl; goto SaveScreen;}  //Checking player input.
     if (UserInput == "c"){
         LoadFromFile("save.txt");
         Sleep(1200);
@@ -148,15 +148,15 @@ int main() {
     UserInput =  toLowerCase(UserInput);
     Validated = Validate(UserInput, "m", "p", "s", "d");
     // Repeats the question if input is incorrect.
-    if (!Validated) {std::cout << "Invalid entry! Please try again!" << endl; goto MainMenuInput;} 
+    if (!Validated) {std::cout << "Invalid entry! Please try again!" << endl; goto MainMenuInput;}                  //Checking player input.
     if (UserInput == "p") {                                                                                         //Chose to buy potions.
         PotionMenu:           
         PotionScreen();
         PotionMenuInput:
         cin >> UserInput;
-        UserInput=  toLowerCase(UserInput);
+        UserInput=  toLowerCase(UserInput);                                                                         // Changing user input to lower case.
         Validated = Validate(UserInput, "r", "b", "p", "n");
-        if (!Validated) {std::cout << "Invalid entry! Please try again!" << endl; goto PotionMenuInput;}
+        if (!Validated) {std::cout << "Invalid entry! Please try again!" << endl; goto PotionMenuInput;}            //Checking player input.
         if (UserInput == "r") {                                                                                     // Chose to buy Red Potion.
             if (ThePlayer.GetGold() < RedPotionCost) {std::cout << "You do not have enough gold to buy that!" << endl; goto PotionMenuInput;}
             ThePlayer.LowerGold(RedPotionCost);
@@ -183,9 +183,9 @@ int main() {
         ArenaMenuPage1();
         ArenaInputPg1:                                                                                              // Arena menu page 1.
         cin >> UserInput;
-        UserInput=  toLowerCase(UserInput);
+        UserInput=  toLowerCase(UserInput);                                                                         // Changing user input to lower case.
         Validated = Validate(UserInput, "a", "b", "c", "p", "n");
-        if (!Validated) {std::cout << "Invalid entry! Please try again!" << endl; goto ArenaInputPg1;} 
+        if (!Validated) {std::cout << "Invalid entry! Please try again!" << endl; goto ArenaInputPg1;}              //Checking player input.
         if (UserInput == "a") {                                                                                     // Chose Wooden Arena.
             CurrentArena = 1;
             Arena();
@@ -210,7 +210,7 @@ int main() {
             cin >> UserInput;
             UserInput =  toLowerCase(UserInput);
             Validated = Validate(UserInput, "d", "e", "f", "g", "p", "n");
-            if (!Validated) {cout << "Invalid entry! Please try again!" << endl; goto ArenaInputPg2;}
+            if (!Validated) {cout << "Invalid entry! Please try again!" << endl; goto ArenaInputPg2;}               //Checking player input.
             if (UserInput == "d") {                                                                                 // Chose Silver Arena.
                 if (Arena3Beat == true) {
                     CurrentArena = 4;
@@ -356,23 +356,23 @@ void Arena() {
     bool MonsterIsAlive = true;                                                                 // Holds whether to move to the next monster because of victory.
     int CurrentMonster = (CurrentArena - 1) * 6;                                                // What monster is being fought.
     int CurrentRound = 1;                                                                       // Used to print the roound number at the beginning of each fight.
-    for (int i = CurrentMonster; i < CurrentMonster + 6; i++) {  // Six monsters for each arena.
+    for (int i = CurrentMonster; i < CurrentMonster + 6; i++) {                                 // Six monsters for each arena.
         ClearScreenWithoutInput();
         ChangeColor(10);
-        cout << "Round " << CurrentRound << ": " << ArrayOfMonsters[i].GetName() << endl;
+        cout << "Round " << CurrentRound << ": " << ArrayOfMonsters[i].GetName() << endl;       // Displaying the current round.
         Sleep(3000);
-        ArrayOfMonsters[i].SetCurrentHP(ArrayOfMonsters[i].GetMaxHP());
+        ArrayOfMonsters[i].SetCurrentHP(ArrayOfMonsters[i].GetMaxHP());                         // Setting monster HP to full.
 
-        while (PlayerIsAlive && MonsterIsAlive) {
+        while (PlayerIsAlive && MonsterIsAlive) { 
             ClearScreenWithoutInput();
-            if (ThePlayer.GetCurrentHP() <= 5) {
+            if (ThePlayer.GetCurrentHP() <= 5) {                                                // Changing HUD color depending on player health.
                 ChangeColor(12);
             } else {
                 ChangeColor(9);
             }
             DisplayStats(i);
 
-            if (ArrayOfMonsters[i].GetAG() < ThePlayer.GetAG()) {
+            if (ArrayOfMonsters[i].GetAG() < ThePlayer.GetAG()) {                              // Checking if player has a higher agility than monster, and changing order of attack.
                 MonsterIsAlive = PlayerTurn(i);
                 if (HasRunAway) {
                     break;
@@ -390,15 +390,15 @@ void Arena() {
                 } 
             }
             Sleep(600);
-            while(kbhit()) getch(); // Clear any keyboard inputs entered while the battle was looping.
+            while(kbhit()) getch();                                                           // Clear any keyboard inputs entered while the battle was looping.
         }
         MonsterIsAlive = true;
-        CurrentRound += 1;
+        CurrentRound += 1;                                                                    // Changing the current round.
         if (PlayerIsAlive == false || HasRunAway == true) {
             break;
         }
     }
-    if (PlayerIsAlive && HasRunAway == false) {
+    if (PlayerIsAlive && HasRunAway == false) {                                               // Checking if player has finished arena, and changing bool values to unlock next.
         cout << Line << endl;
         cout << "You beat the Gauntlet!" << endl;
         if (CurrentArena == 6) {
@@ -419,38 +419,38 @@ void Arena() {
 
 // The monster's attack. Computes damage with MonsterATK - PlayerDEF. Also checks for game over.
 bool MonsterTurn(int MonsterNumber) {
-    int MissChance = 0;                     // Chance for player to miss. Filled with a random number each attack.
+    int MissChance = 0;                                                                      // Chance for player to miss. Filled with a random number each attack.
     MissChance = HitChanceDistribution(Generator);
     if (MissChance != 20) {
         int DamageDealt;
-        DamageDealt = (ArrayOfMonsters[MonsterNumber].GetATK() - ThePlayer.GetDEF()) + DamageDistribution(Generator);
-        if (DamageDealt <= 0) {
+        DamageDealt = (ArrayOfMonsters[MonsterNumber].GetATK() - ThePlayer.GetDEF()) + DamageDistribution(Generator); // Calculate damage dealt to the player, depending on monster's attack, and player defense.
+        if (DamageDealt <= 0) {                                                              // If the attack is less than 0, deal 1 damage.
             DamageDealt = 1;
         }
-        ThePlayer.LowerCurrentHP(DamageDealt);
-        // If monster is faster than player, save damage text, refresh screen, then reprint damage text.
+        ThePlayer.LowerCurrentHP(DamageDealt);                                               // Decrease player current health.
+                                                                                             // If monster is faster than player, save damage text, refresh screen, then reprint damage text.
         if (ArrayOfMonsters[MonsterNumber].GetAG() > ThePlayer.GetAG()) {
             DisplayStats(MonsterNumber);
         }
         ChangeColor(12);
-        cout << ArrayOfMonsters[MonsterNumber].GetName() << " "
+        cout << ArrayOfMonsters[MonsterNumber].GetName() << " "                              // Displaying monster attack text.
             << ArrayOfMonsters[MonsterNumber].GetMethodOfAttack()
             << " you for " << DamageDealt << " damage!" << endl;
         Sleep(200);
         //DisplayStats(MonsterNumber);
         if (ThePlayer.GetCurrentHP() <= 0) {
             ChangeColor(12);
-            cout << "Too bad! You've lost the Gauntlet!" << endl;
-            DeathCounter++;
+            cout << "Too bad! You've lost the Gauntlet!" << endl;                            // Player has died.
+            DeathCounter++;                                                                  // Increment death counter.
             Sleep(2000);
-            ThePlayer.SetCurrentHP(ThePlayer.GetMaxHP());
+            ThePlayer.SetCurrentHP(ThePlayer.GetMaxHP());                                    // Set player health to max and go back to the menu.
             return false;
         } else {
             return true;
         }
     } else {
         ChangeColor(13);
-        cout << ArrayOfMonsters[MonsterNumber].GetName() << " misses!" << endl;
+        cout << ArrayOfMonsters[MonsterNumber].GetName() << " misses!" << endl;              // Displayind miss text.
         return true;
     }
 }
@@ -460,49 +460,49 @@ bool PlayerTurn(int MonsterNumber) {
     HasRunAway = false;
     PlayerBattleChoice:
     ChangeColor(11);
-    cout << "Enter an action: ('a' = ATTACK, 'p' = POTION, 'g' = GIVE UP)" << endl;
+    cout << "Enter an action: ('a' = ATTACK, 'p' = POTION, 'g' = GIVE UP)" << endl;          // Displaying player input options when fighting.
     cin >> UserInput;
-    UserInput=  toLowerCase(UserInput);
+    UserInput=  toLowerCase(UserInput);                                                      // Changing user input to lower case.
     Validated = Validate(UserInput, "a", "p", "g");
-    if (!Validated) {cout << "Invalid entry! Please try again!" << endl; goto PlayerBattleChoice;}
+    if (!Validated) {cout << "Invalid entry! Please try again!" << endl; goto PlayerBattleChoice;} //Checking player input.
     if (UserInput == "a") {                                                                                                 // Chose to attack.
         int MissChance = 0;
         MissChance = HitChanceDistribution(Generator);
         if (MissChance != 20) {
 
             int DamageDealt;
-            DamageDealt = (ThePlayer.GetATK() - ArrayOfMonsters[MonsterNumber].GetDEF()) + DamageDistribution(Generator);
-            if (DamageDealt <= 0) {
+            DamageDealt = (ThePlayer.GetATK() - ArrayOfMonsters[MonsterNumber].GetDEF()) + DamageDistribution(Generator); // Calculating player damage to monster based on player attack and monster defense.
+            if (DamageDealt <= 0) {                                                           // If damage dealt is lower than 0, deal 1 damage.
                 DamageDealt = 1;
             }
             MissChance = HitChanceDistribution(Generator);
             if (MissChance == 20) {
                 DamageDealt *= 2;
                 ChangeColor(13);
-                cout << "Critical hit! You hit the enemy for " << DamageDealt << " damage!" << endl;
+                cout << "Critical hit! You hit the enemy for " << DamageDealt << " damage!" << endl; // Setting up player critical damage.
             } else {
                 ChangeColor(9);
-                cout << "You hit the enemy for " << DamageDealt << " damage!" << endl;
+                cout << "You hit the enemy for " << DamageDealt << " damage!" << endl;         // Displaying damage text.
             }
             
-            ArrayOfMonsters[MonsterNumber].LowerCurrentHP(DamageDealt);
+            ArrayOfMonsters[MonsterNumber].LowerCurrentHP(DamageDealt);                        // Decreasing monster health based on damage dealt by player.
             Sleep(200);
             if (ArrayOfMonsters[MonsterNumber].GetCurrentHP() <= 0) {
                 ChangeColor(14);
-                cout << "You've won!" << endl;
+                cout << "You've won!" << endl;                                                 // Displaying finished battle text, and setting player variables to new values.
                 cout << "You've gained " << ArrayOfMonsters[MonsterNumber].GetEXP() << " EXP and " 
                     << ArrayOfMonsters[MonsterNumber].GetGold() << " gold!" << endl;
                 ThePlayer.AddCurrentEXP(ArrayOfMonsters[MonsterNumber].GetEXP());
                 ThePlayer.RaiseGold(ArrayOfMonsters[MonsterNumber].GetGold());
                 Sleep(1000);
-                ArrayOfMonsters[MonsterNumber].SetCurrentHP(ArrayOfMonsters[MonsterNumber].GetMaxHP());
+                ArrayOfMonsters[MonsterNumber].SetCurrentHP(ArrayOfMonsters[MonsterNumber].GetMaxHP()); // Setting monster health to full.
                 return false;
             } else {
                 return true;
             }
         } else {
             ChangeColor(13);
-            cout << "You missed!" << endl;
+            cout << "You missed!" << endl;                                                     // Displaying missed attack text.
             Sleep(200);
             return true;
         }
@@ -511,7 +511,7 @@ bool PlayerTurn(int MonsterNumber) {
         PotionInventory:
         ClearScreenWithoutInput();
         ChangeColor(11);
-        std::cout << Line << endl;
+        std::cout << Line << endl;                                                                          // Displaying player's potion inventory.
         std::cout << "Potion Inventory" << endl;
         std::cout << Line << endl;
         ChangeColor(4);
@@ -525,9 +525,9 @@ bool PlayerTurn(int MonsterNumber) {
         std::cout << "Enter the potion you want to use ('r', 'b', 'p') or 'n' to go back: " << endl;
         PotionInventoryInput:
         cin >> UserInput;
-        UserInput=  toLowerCase(UserInput);
+        UserInput=  toLowerCase(UserInput);                                                                // Changing user input to lower case.
         Validated = Validate(UserInput, "r", "b", "p", "n");
-        if (!Validated) {cout << "Invalid entry! Please try again!" << endl; goto PotionInventoryInput;}
+        if (!Validated) {cout << "Invalid entry! Please try again!" << endl; goto PotionInventoryInput;}   //Checking player input.
         
         //Creating logic of the Red Potion
         if (UserInput == "r"){
