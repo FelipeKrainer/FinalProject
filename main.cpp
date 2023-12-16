@@ -847,9 +847,9 @@ void PotionScreen() {
     ChangeColor(9);
     cout << Line << endl;
     cout << "You have " << ThePlayer.GetGold() << " Gold in your bag."<< endl;
-    cout << "'r' = Red Potion"<< "("<<RedPotionHeal<<" Health)"<<"    ($" << RedPotionCost << ")" << " (" << RedPotionsInBag << " in bag)" << endl;
-    cout << "'b' = Blue Potion"<< "("<<BluePotionHeal<<" Health)"<<"   ($" << BluePotionCost << ")" << " (" << BluePotionsInBag << " in bag)" << endl;
-    cout << "'p' = Purple Potion"<< "("<<PurplePotionHeal<<" Health)"<<" ($" << PurplePotionCost << ")" << " (" << PurplePotionsInBag << " in bag)" << endl;
+    cout << "'r' = Red Potion"<< "    ("<<RedPotionHeal<<" Health)"<<" ($" << RedPotionCost << ")" << " (" << RedPotionsInBag << " in bag)" << endl;
+    cout << "'b' = Blue Potion"<< "   ("<<BluePotionHeal<<" Health)"<<" ($" << BluePotionCost << ")" << " (" << BluePotionsInBag << " in bag)" << endl;
+    cout << "'p' = Purple Potion"<< " ("<<PurplePotionHeal<<" Health)"<<" ($" << PurplePotionCost << ")" << " (" << PurplePotionsInBag << " in bag)" << endl;
     cout << "'n' = Nevermind..." << endl;
     cout << Line << endl;
     ChangeColor(11);
