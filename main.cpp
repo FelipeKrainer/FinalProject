@@ -805,7 +805,7 @@ void StatsScreen(){
     CH("|     \\ \\__'_/\\-___-/\\ \\__        |",12);CH("            Defense:          ",6);cout << ThePlayer.GetDEF() << endl;
     CH("|      \\/ /// ]=====[ [* |  ]     |",12);CH("            Agility:          ",6);cout << ThePlayer.GetAG() << endl;
     CH("|      |/()   / ___ \\ \\ -+- /     |",12);CH("*********************************************\n",9);
-    CH("|            /_/ _ \\_\\ \\_|_/      |",12);CH("            Experience:       ",6);cout << ThePlayer.GetCurrentEXP() << endl;
+    CH("|            /_/ _ \\_\\ \\_|_/      |",12);CH("            Experience:       ",6);cout << ThePlayer.GetCurrentEXP() << "/" << ThePlayer.GetEXPToNextLevel() << endl;
     CH("|             |__|__|             |",12);CH("            Gold:             ",6);cout << ThePlayer.GetGold() << endl;
     CH("|            _|_ | _|_            |",12);CH("            Defeats:          ",6);cout << DeathCounter << endl;
     CH("|_      - --|*  \\|/   |-- -      _|",12);CH("*********************************************",9);cout << endl;
