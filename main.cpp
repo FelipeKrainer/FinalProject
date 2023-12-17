@@ -125,11 +125,13 @@ int main() {
     Introduction();                                                     // Displaying the sword animation.
     std::cout << "Press Enter to begin..." << endl;
     std::cin.get();
-    SaveScreen:
+    
     OpeningMenuScreen();                                                // Displaying the menu animation and asking if user wants to start new game, or continue.
-    cin >> UserInput;
+    SaveScreen:
+    getline(std::cin, UserInput);
     UserInput = toLowerCase(UserInput);
     Validated = Validate(UserInput, "c", "s", "e");
+    
     if (!Validated) {std::cout << "Invalid entry! Please try again!" << endl; goto SaveScreen;}  //Checking player input.
     if (UserInput == "c"){
         LoadFromFile("save.txt");
@@ -144,7 +146,7 @@ int main() {
     ChangeColor(11);
     MainMenu();
     MainMenuInput:                                                                                                  // The main menu option box.
-    cin >> UserInput;
+    getline(std::cin, UserInput);
     UserInput =  toLowerCase(UserInput);
     Validated = Validate(UserInput, "m", "p", "s", "d");
     // Repeats the question if input is incorrect.
@@ -153,7 +155,7 @@ int main() {
         PotionMenu:           
         PotionScreen();
         PotionMenuInput:
-        cin >> UserInput;
+        getline(std::cin, UserInput);
         UserInput=  toLowerCase(UserInput);                                                                         // Changing user input to lower case.
         Validated = Validate(UserInput, "r", "b", "p", "n");
         if (!Validated) {std::cout << "Invalid entry! Please try again!" << endl; goto PotionMenuInput;}            //Checking player input.
@@ -182,7 +184,7 @@ int main() {
         ArenaMenu:                                                                                              
         ArenaMenuPage1();
         ArenaInputPg1:                                                                                              // Arena menu page 1.
-        cin >> UserInput;
+        getline(std::cin, UserInput);
         UserInput=  toLowerCase(UserInput);                                                                         // Changing user input to lower case.
         Validated = Validate(UserInput, "a", "b", "c", "p", "n");
         if (!Validated) {std::cout << "Invalid entry! Please try again!" << endl; goto ArenaInputPg1;}              //Checking player input.
@@ -207,7 +209,7 @@ int main() {
         if (UserInput == "p") {
             ArenaMenuPage2();
             ArenaInputPg2:                                                                                          // Arena menu page 2.
-            cin >> UserInput;
+            getline(std::cin, UserInput);
             UserInput =  toLowerCase(UserInput);
             Validated = Validate(UserInput, "d", "e", "f", "g", "p", "n");
             if (!Validated) {cout << "Invalid entry! Please try again!" << endl; goto ArenaInputPg2;}               //Checking player input.
@@ -463,10 +465,11 @@ bool MonsterTurn(int MonsterNumber) {
 // The player's turn in which they can choose to attack, use a potion, or give up. Also checks for victory.
 bool PlayerTurn(int MonsterNumber) {
     HasRunAway = false;
-    PlayerBattleChoice:
     ChangeColor(11);
     cout << "Enter an action: ('a' = ATTACK, 'p' = POTION, 'g' = GIVE UP)" << endl;          // Displaying player input options when fighting.
-    cin >> UserInput;
+    PlayerBattleChoice:
+    ChangeColor(11);
+    getline(std::cin, UserInput);
     UserInput=  toLowerCase(UserInput);                                                      // Changing user input to lower case.
     Validated = Validate(UserInput, "a", "p", "g");
     if (!Validated) {cout << "Invalid entry! Please try again!" << endl; goto PlayerBattleChoice;} //Checking player input.
@@ -529,7 +532,7 @@ bool PlayerTurn(int MonsterNumber) {
         std::cout << Line << endl;
         std::cout << "Enter the potion you want to use ('r', 'b', 'p') or 'n' to go back: " << endl;
         PotionInventoryInput:
-        cin >> UserInput;
+        getline(std::cin, UserInput);
         UserInput=  toLowerCase(UserInput);                                                                // Changing user input to lower case.
         Validated = Validate(UserInput, "r", "b", "p", "n");
         if (!Validated) {cout << "Invalid entry! Please try again!" << endl; goto PotionInventoryInput;}   //Checking player input.
@@ -616,7 +619,8 @@ void ChangeColor(int Color) {
         HANDLE console_color; 
         console_color = GetStdHandle(STD_OUTPUT_HANDLE); 
         SetConsoleTextAttribute(console_color, Color); 
-    }
+    } 
+    // Code needed for Linux and Mac OS operating systems.
 }
 
 // Prints text one character at a time.
@@ -820,7 +824,7 @@ void StatsScreen(){
     ChangeColor(11);
     cout << "Please enter what you want to do: " << endl;
     Stats:
-    cin >> UserInput;
+    getline(std::cin, UserInput);
     UserInput = toLowerCase(UserInput);
     if (UserInput == "n"){
         MainMenu();
@@ -1172,6 +1176,7 @@ void DisplayFatherAnimation(int Frame) {
     std::cout << Line << endl;
 }
 
+// Displays the credits one line at a time.
 void ShowFatherAndSon() {
     ClearScreenWithoutInput();
     ChangeColor(15);
@@ -1199,6 +1204,7 @@ void ShowFatherAndSon() {
     Scroll(" You're the best!\n\n");
 }
 
+// Displays the exit screen.
 void DisplaySunrise() {
     IncorrectInput:
     ClearScreenWithoutInput();
@@ -1234,7 +1240,7 @@ void DisplaySunrise() {
     cout << Line << endl;
     ChangeColor(11);
     cout << "Enter 'c' to close the game. " << endl;
-    cin >> UserInput;
+    getline(std::cin, UserInput);
     UserInput = toLowerCase(UserInput);
     if (UserInput != "c"){
         goto IncorrectInput;

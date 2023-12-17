@@ -34,4 +34,4 @@ EvilCrystal 148 40 26 22 50 300 slashes
 PottedTree 154 42 20 18 52 350 scratches
 Puncher 160 42 10 20 60 388 socks
 Dealer 200 45 25 32 75 425 crushes
-LegacyBeast 10 55 256 256 256 512 hits
+LegacyBeast 16 55 256 256 256 512 hits
