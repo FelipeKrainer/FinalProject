@@ -1,3 +1,10 @@
+//**************************************************************************************************************************
+// Program: Monster Arena
+// Authors: Phelipe Krainer and Samuel Johnson
+// Description: A text-based turn-based arena fighting game that utilizes the terminal for input and output.
+// Last Updated: 12/17/2023
+//**************************************************************************************************************************
+
 // Link command: g++ main.cpp Monster.cpp Player.cpp -o TurnBasedBattleSystem.exe
 // Run in the Command Prompt in the folder containing the "Monster.h", "Monster.cpp", and "TurnBasedBattleSystem.cpp" files.
 
