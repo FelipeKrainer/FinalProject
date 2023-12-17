@@ -711,9 +711,9 @@ void OpeningMenuScreen (){
     std::cout << "\t\t\t*             GAME MENU             *\n";
     std::cout << "\t\t\t*************************************\n";
     std::cout << "\t\t\t*                                   *\n";
-    std::cout << "\t\t\t*  S. Start New Game                *\n";
-    std::cout << "\t\t\t*  C. Continue                      *\n";
-    std::cout << "\t\t\t*  E. Exit                          *\n";
+    std::cout << "\t\t\t*  's' = Start New Game             *\n";
+    std::cout << "\t\t\t*  'c' = Continue                   *\n";
+    std::cout << "\t\t\t*  'e' = Exit                       *\n";
     std::cout << "\t\t\t*                                   *\n";
     std::cout << "\t\t\t*************************************\n";
     std::cout << Line << endl;
@@ -877,13 +877,14 @@ bool BattlePotionMenu(string PotionColor, int PotionHealAmount, int MonsterNumbe
         if (ThePlayer.GetCurrentHP() > ThePlayer.GetMaxHP()) {
             ThePlayer.SetCurrentHP(ThePlayer.GetMaxHP());
         }
-        std::cout << "You've healed! Current Health: " << ThePlayer.GetCurrentHP() << endl;
+        std::cout << "You've recovered up to " << PotionHealAmount << " HP!" << endl;
+        std::cout << "Current HP: " << ThePlayer.GetCurrentHP() << "/" << ThePlayer.GetMaxHP() << endl;
             //Decrementing the amount of red potions
         if (PotionColor == "Red") {RedPotionsInBag--;}
         else if (PotionColor == "Blue") {BluePotionsInBag--;}
         else{PurplePotionsInBag--;}
                 
-        Sleep(1000);
+        Sleep(1500);
         if (MonsterNumber != 36) {
             DisplayStats(MonsterNumber);
         } else {
@@ -996,7 +997,7 @@ bool FinalBattle() {
     // Clears the screen and displays the current round. Sets up the current monster's HP.
     ClearScreenWithoutInput();
     ChangeColor(10);
-    std::cout << "Final round: " << ArrayOfMonsters[36].GetName() << endl;
+    std::cout << "Final Round: " << ArrayOfMonsters[36].GetName() << endl;
     Sleep(3000);
     ArrayOfMonsters[36].SetCurrentHP(ArrayOfMonsters[36].GetMaxHP());
 
